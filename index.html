@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Dashboard analítico do Lançamento Interno #26 da Dev em Dobro — Semana do Zero ao Programador. Métricas de leads, email marketing, fontes de captação, compradores e insights.">
+<meta name="author" content="Dev em Dobro">
+<title>Dashboard LI26 — Dev em Dobro | Semana do Zero ao Programador</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-main: #F5F7FA;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #FAFBFD;
+  --border: #E2E8F0;
+  --border-light: #EDF2F7;
+  --text-primary: #1A2332;
+  --text-secondary: #5A6B7F;
+  --text-muted: #94A3B8;
+  --text-white: #FFFFFF;
+  --blue-600: #2563EB;
+  --blue-500: #3B82F6;
+  --blue-400: #60A5FA;
+  --blue-100: #DBEAFE;
+  --blue-50: #EFF6FF;
+  --green-600: #059669;
+  --green-500: #10B981;
+  --green-100: #D1FAE5;
+  --green-50: #ECFDF5;
+  --amber-600: #D97706;
+  --amber-500: #F59E0B;
+  --amber-100: #FEF3C7;
+  --amber-50: #FFFBEB;
+  --red-600: #DC2626;
+  --red-500: #EF4444;
+  --red-100: #FEE2E2;
+  --red-50: #FEF2F2;
+  --purple-600: #7C3AED;
+  --purple-500: #8B5CF6;
+  --purple-100: #EDE9FE;
+  --purple-50: #F5F3FF;
+  --teal-500: #14B8A6;
+  --teal-100: #CCFBF1;
+  --pink-500: #EC4899;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-xs: 6px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Outfit', -apple-system, sans-serif; background: var(--bg-main); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; }
+.deco-blob { position: fixed; border-radius: 50%; filter: blur(100px); pointer-events: none; z-index: 0; }
+.deco-blob.b1 { top: -120px; right: -80px; width: 400px; height: 400px; background: rgba(37,99,235,0.06); }
+.deco-blob.b2 { bottom: -100px; left: -60px; width: 350px; height: 350px; background: rgba(16,185,129,0.05); }
+.container { position: relative; z-index: 1; max-width: 1480px; margin: 0 auto; padding: 28px 24px; }
+
+/* HEADER */
+.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; padding: 24px 28px; background: linear-gradient(135deg, #1B2A4A 0%, #243B6A 60%, #2D4A7A 100%); border-radius: var(--radius); box-shadow: var(--shadow-lg); position: relative; overflow: hidden; }
+.header::before { content: ''; position: absolute; top: 0; right: 0; width: 300px; height: 100%; background: radial-gradient(ellipse at 80% 50%, rgba(59,130,246,0.2), transparent 70%); pointer-events: none; }
+.header-left h1 { font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: 700; letter-spacing: -0.5px; color: var(--text-white); }
+.header-left h1 span { color: var(--blue-400); }
+.header-left .subtitle { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 4px; font-weight: 400; }
+.header-right { display: flex; align-items: center; gap: 10px; position: relative; z-index: 1; }
+.badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; }
+.badge-phase { background: rgba(245,158,11,0.2); color: #FBBF24; }
+.badge-live { background: rgba(16,185,129,0.2); color: #34D399; }
+.badge-live::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #34D399; animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* TABS */
+.tab-bar { display: flex; gap: 2px; margin-bottom: 24px; background: var(--bg-card); border-radius: var(--radius); padding: 5px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+.tab-btn { padding: 10px 22px; border: none; background: transparent; color: var(--text-secondary); font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; border-radius: var(--radius-sm); transition: all 0.25s; white-space: nowrap; }
+.tab-btn:hover { color: var(--text-primary); background: var(--blue-50); }
+.tab-btn.active { color: var(--text-white); background: var(--blue-600); font-weight: 600; box-shadow: 0 2px 8px rgba(37,99,235,0.3); }
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* SECTION */
+.section-title { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2.5px; color: var(--text-muted); margin-bottom: 14px; padding-left: 14px; border-left: 3px solid var(--blue-500); }
+
+/* SEARCH */
+.search-bar { display: flex; align-items: center; gap: 10px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 16px; margin-bottom: 16px; box-shadow: var(--shadow-sm); transition: border-color 0.2s; }
+.search-bar:focus-within { border-color: var(--blue-400); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+.search-bar svg { width: 18px; height: 18px; color: var(--text-muted); flex-shrink: 0; }
+.search-bar input { flex: 1; border: none; outline: none; background: transparent; font-family: 'Outfit', sans-serif; font-size: 14px; color: var(--text-primary); }
+.search-bar input::placeholder { color: var(--text-muted); }
+
+/* KPI */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 28px; }
+.kpi-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; transition: all 0.3s ease; position: relative; overflow: hidden; box-shadow: var(--shadow-sm); }
+.kpi-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.kpi-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: var(--radius) var(--radius) 0 0; }
+.kpi-card.blue::after { background: linear-gradient(90deg, var(--blue-500), var(--blue-400)); }
+.kpi-card.green::after { background: linear-gradient(90deg, var(--green-500), #6EE7B7); }
+.kpi-card.amber::after { background: linear-gradient(90deg, var(--amber-500), #FCD34D); }
+.kpi-card.red::after { background: linear-gradient(90deg, var(--red-500), #FCA5A5); }
+.kpi-card.purple::after { background: linear-gradient(90deg, var(--purple-500), #C4B5FD); }
+.kpi-card.teal::after { background: linear-gradient(90deg, var(--teal-500), #5EEAD4); }
+.kpi-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; font-size: 18px; }
+.kpi-icon.blue { background: var(--blue-100); color: var(--blue-600); }
+.kpi-icon.green { background: var(--green-100); color: var(--green-600); }
+.kpi-icon.amber { background: var(--amber-100); color: var(--amber-600); }
+.kpi-icon.red { background: var(--red-100); color: var(--red-600); }
+.kpi-icon.purple { background: var(--purple-100); color: var(--purple-600); }
+.kpi-icon.teal { background: var(--teal-100); color: var(--teal-500); }
+.kpi-label { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; }
+.kpi-value { font-family: 'JetBrains Mono', monospace; font-size: 28px; font-weight: 700; line-height: 1; color: var(--text-primary); }
+.kpi-sub { font-size: 12px; color: var(--text-secondary); margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+.kpi-sub .up { color: var(--green-600); font-weight: 600; }
+.kpi-sub .down { color: var(--red-600); font-weight: 600; }
+.kpi-sub .neutral { color: var(--amber-600); font-weight: 600; }
+
+/* CHARTS */
+.charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 28px; }
+.chart-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-sm); }
+.chart-card.full { grid-column: 1 / -1; }
+.chart-title { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+.chart-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
+.chart-wrapper { position: relative; width: 100%; }
+.chart-wrapper.h300 { height: 300px; }
+.chart-wrapper.h350 { height: 350px; }
+.chart-wrapper.h400 { height: 400px; }
+
+/* FUNNEL */
+.funnel { display: flex; flex-direction: column; align-items: center; gap: 0; padding: 8px 0; }
+.funnel-step { display: flex; align-items: center; justify-content: center; padding: 18px 24px; text-align: center; position: relative; border-radius: var(--radius-sm); transition: all 0.3s ease; }
+.funnel-step:hover { transform: scale(1.02); }
+.funnel-step .step-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.8; }
+.funnel-step .step-value { font-family: 'JetBrains Mono', monospace; font-size: 30px; font-weight: 800; }
+.funnel-step .step-rate { font-size: 12px; margin-top: 4px; font-weight: 500; }
+.funnel-arrow { font-size: 18px; color: var(--text-muted); padding: 2px 0; }
+
+/* STATUS */
+.status-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+.status-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; text-align: center; box-shadow: var(--shadow-sm); }
+.status-card .status-dot { width: 12px; height: 12px; border-radius: 50%; margin: 0 auto 12px; }
+.status-card.confirmado .status-dot { background: var(--green-500); box-shadow: 0 0 10px rgba(16,185,129,0.3); }
+.status-card.pendente .status-dot { background: var(--amber-500); box-shadow: 0 0 10px rgba(245,158,11,0.3); }
+.status-card.nao-confirmado .status-dot { background: var(--red-500); box-shadow: 0 0 10px rgba(239,68,68,0.3); }
+.status-card .status-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.status-card.confirmado .status-label { color: var(--green-600); }
+.status-card.pendente .status-label { color: var(--amber-600); }
+.status-card.nao-confirmado .status-label { color: var(--red-600); }
+.status-card .status-value { font-family: 'JetBrains Mono', monospace; font-size: 36px; font-weight: 800; color: var(--text-primary); }
+.status-card .status-pct { font-size: 13px; color: var(--text-secondary); margin-top: 4px; font-weight: 500; }
+.status-bar { display: flex; height: 10px; border-radius: 5px; overflow: hidden; background: var(--border-light); }
+.status-bar .seg { transition: width 0.8s ease; }
+.status-bar .seg.green { background: var(--green-500); }
+.status-bar .seg.amber { background: var(--amber-500); }
+.status-bar .seg.red { background: var(--red-500); }
+
+/* TABLE */
+.data-table-wrapper { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 28px; overflow-x: auto; box-shadow: var(--shadow-sm); }
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table thead th { text-align: left; padding: 10px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); border-bottom: 2px solid var(--border); white-space: nowrap; background: var(--bg-main); cursor: pointer; user-select: none; position: relative; }
+.data-table thead th:hover { color: var(--blue-600); }
+.data-table thead th .sort-icon { margin-left: 4px; font-size: 10px; opacity: 0.5; }
+.data-table thead th.sort-active .sort-icon { opacity: 1; color: var(--blue-600); }
+.data-table tbody td { padding: 10px 12px; border-bottom: 1px solid var(--border-light); color: var(--text-secondary); vertical-align: middle; }
+.data-table tbody tr { transition: background 0.15s; }
+.data-table tbody tr:hover td { background: var(--blue-50); }
+.data-table tbody tr.hidden { display: none; }
+.data-table .campaign-name { color: var(--text-primary); font-weight: 500; max-width: 400px; line-height: 1.4; }
+.data-table .campaign-name .ac-name { font-size: 11px; color: var(--text-muted); display: block; margin-top: 2px; }
+.data-table .metric-good { color: var(--green-600); font-weight: 700; }
+.data-table .metric-avg { color: var(--amber-600); font-weight: 700; }
+.data-table .metric-bad { color: var(--red-600); font-weight: 700; }
+.data-table .mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+.type-badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; }
+.type-badge.eng { background: var(--green-100); color: var(--green-600); }
+.type-badge.cad { background: var(--blue-100); color: var(--blue-600); }
+
+/* AUTOMATION */
+.auto-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 28px; }
+.auto-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 18px; display: flex; align-items: center; gap: 14px; box-shadow: var(--shadow-sm); transition: box-shadow 0.2s; }
+.auto-card:hover { box-shadow: var(--shadow-md); }
+.auto-status { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.auto-status.active { background: var(--green-500); box-shadow: 0 0 8px rgba(16,185,129,0.4); }
+.auto-info { flex: 1; }
+.auto-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.auto-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.auto-count-wrap { text-align: right; }
+.auto-count { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700; color: var(--blue-600); }
+.auto-count-label { font-size: 10px; color: var(--text-muted); font-weight: 500; }
+
+/* INSIGHTS */
+.insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 28px; }
+.insight-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow-sm); border-left: 4px solid transparent; }
+.insight-card:hover { box-shadow: var(--shadow-md); }
+.insight-card.full { grid-column: 1 / -1; }
+.insight-type { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+.insight-type.positive { color: var(--green-600); }
+.insight-type.warning { color: var(--amber-600); }
+.insight-type.critical { color: var(--red-600); }
+.insight-type.info { color: var(--blue-600); }
+.insight-type.sales { color: var(--purple-600); }
+.insight-card.border-green { border-left-color: var(--green-500); }
+.insight-card.border-amber { border-left-color: var(--amber-500); }
+.insight-card.border-red { border-left-color: var(--red-500); }
+.insight-card.border-blue { border-left-color: var(--blue-500); }
+.insight-card.border-purple { border-left-color: var(--purple-500); }
+.insight-title { font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; line-height: 1.3; }
+.insight-body { font-size: 13px; color: var(--text-secondary); line-height: 1.65; }
+
+/* SOURCE BARS */
+.source-bar-list { display: flex; flex-direction: column; gap: 10px; }
+.source-bar-item { display: flex; align-items: center; gap: 12px; }
+.source-bar-label { font-size: 12px; font-weight: 500; color: var(--text-secondary); min-width: 120px; text-align: right; }
+.source-bar-track { flex: 1; height: 28px; background: var(--bg-main); border-radius: 6px; overflow: hidden; }
+.source-bar-fill { height: 100%; border-radius: 6px; transition: width 1s ease; display: flex; align-items: center; padding-left: 10px; }
+.source-bar-value { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: white; }
+.source-bar-pct { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); min-width: 50px; }
+
+/* PRIORITY */
+.priority-badge { display: inline-block; padding: 4px 10px; border-radius: 5px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px; }
+.priority-badge.urgent { background: var(--red-100); color: var(--red-600); }
+.priority-badge.high { background: var(--amber-100); color: var(--amber-600); }
+.priority-badge.medium { background: var(--blue-100); color: var(--blue-600); }
+
+/* Sub-tab pills for email */
+.sub-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+.sub-tab { padding: 8px 18px; border: 2px solid var(--border); background: var(--bg-card); border-radius: 24px; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: all 0.2s; }
+.sub-tab:hover { border-color: var(--blue-400); color: var(--blue-600); }
+.sub-tab.active { border-color: var(--blue-500); background: var(--blue-50); color: var(--blue-600); }
+.sub-panel { display: none; }
+.sub-panel.active { display: block; }
+
+/* Tier badges */
+.tier-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
+.tier-badge.tier-a { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); color: #065F46; }
+.tier-badge.tier-b { background: linear-gradient(135deg, #DBEAFE, #BFDBFE); color: #1E40AF; }
+.tier-badge.tier-c { background: linear-gradient(135deg, #FEF3C7, #FDE68A); color: #92400E; }
+.tier-badge.tier-none { background: var(--bg-main); color: var(--text-muted); }
+.status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+.status-dot.green { background: var(--green-500); }
+.status-dot.red { background: var(--red-500); }
+
+@media (max-width: 1024px) { .charts-row, .insights-grid { grid-template-columns: 1fr; } .charts-row .full, .insights-grid .full { grid-column: 1; } .status-grid { grid-template-columns: 1fr; } }
+@media (max-width: 768px) { .tab-btn { padding: 8px 14px; font-size: 12px; } }
+@media (max-width: 640px) { .kpi-grid { grid-template-columns: 1fr 1fr !important; } .header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 18px 20px; } .kpi-value { font-size: 22px; } .status-card .status-value { font-size: 28px; } .tab-bar { overflow-x: auto; flex-wrap: nowrap; } }
+@media print { body { background: white; } .tab-bar, .search-bar, .sub-tabs { display: none; } .tab-content, .sub-panel { display: block !important; } }
+</style>
+</head>
+<body>
+<div class="deco-blob b1"></div>
+<div class="deco-blob b2"></div>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <h1>LI#26 — <span>Dev em Dobro</span></h1>
+      <div class="subtitle">Semana do Zero ao Programador &middot; Relatório de Lançamento &middot; 03/Mar — 30/Mar 2026 &middot; <strong style="color:#FBBF24;">Atualizado 01/04/2026</strong></div>
+    </div>
+    <div class="header-right">
+      <span class="badge badge-phase">ENCERRADO</span>
+      <span class="badge" style="background:rgba(139,92,246,0.2);color:#C4B5FD;">Lançamento Concluído</span>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('overview',this)">Visão Geral</button>
+    <button class="tab-btn" onclick="switchTab('email',this)">Email Marketing</button>
+    <button class="tab-btn" onclick="switchTab('captacao',this)">Fontes de Captação</button>
+    <button class="tab-btn" onclick="switchTab('insights',this)">Insights & Vendas</button>
+    <button class="tab-btn" onclick="switchTab('compradores',this)">Compradores</button>
+  </div>
+
+  <!-- =================== VISÃO GERAL =================== -->
+  <div id="tab-overview" class="tab-content active">
+    <div class="search-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Buscar lead por e-mail, nome ou fonte...">
+    </div>
+
+    <div class="section-title">KPIs Principais</div>
+    <div class="kpi-grid">
+      <div class="kpi-card blue">
+        <div class="kpi-icon blue">&#9775;</div>
+        <div class="kpi-label">Total de Leads</div>
+        <div class="kpi-value">5.653</div>
+        <div class="kpi-sub"><span class="up">&#9650; 87.6% tráfego pago</span></div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-icon green">&#10004;</div>
+        <div class="kpi-label">Confirmados (Optin)</div>
+        <div class="kpi-value">2.074</div>
+        <div class="kpi-sub"><span class="up">36.7% taxa de confirmação</span></div>
+      </div>
+      <div class="kpi-card teal">
+        <div class="kpi-icon teal">&#9745;</div>
+        <div class="kpi-label">Check-ins Realizados</div>
+        <div class="kpi-value">659</div>
+        <div class="kpi-sub"><span class="neutral">11.66% dos cadastros</span></div>
+      </div>
+      <div class="kpi-card amber">
+        <div class="kpi-icon amber">&#9733;</div>
+        <div class="kpi-label">Pico Diário de Leads</div>
+        <div class="kpi-value">518</div>
+        <div class="kpi-sub">22/Mar — melhor dia de captação</div>
+      </div>
+      <div class="kpi-card purple">
+        <div class="kpi-icon purple">&#9993;</div>
+        <div class="kpi-label">Envios LI26</div>
+        <div class="kpi-value">85.5K</div>
+        <div class="kpi-sub">19 campanhas + 6 automações</div>
+      </div>
+      <div class="kpi-card red">
+        <div class="kpi-icon red">&#8635;</div>
+        <div class="kpi-label">Bounces LI26</div>
+        <div class="kpi-value">~430</div>
+        <div class="kpi-sub"><span class="down">0.50% taxa de rejeição</span></div>
+      </div>
+    </div>
+
+    <!-- Confirmation Status -->
+    <div class="section-title">Status de Confirmação — Campo [LI26] Status</div>
+    <div class="status-grid">
+      <div class="status-card confirmado">
+        <div class="status-dot"></div>
+        <div class="status-label">Confirmado</div>
+        <div class="status-value">2.074</div>
+        <div class="status-pct">36.8% dos cadastros</div>
+      </div>
+      <div class="status-card pendente">
+        <div class="status-dot"></div>
+        <div class="status-label">Pendente</div>
+        <div class="status-value">~12</div>
+        <div class="status-pct">~5.1% — na fila da automação</div>
+      </div>
+      <div class="status-card nao-confirmado">
+        <div class="status-dot"></div>
+        <div class="status-label">Não Confirmado</div>
+        <div class="status-value">~3.567</div>
+        <div class="status-pct">~63.1% — não abriram os e-mails</div>
+      </div>
+    </div>
+    <div class="chart-card full" style="margin-bottom:28px;padding:16px 24px;">
+      <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:10px;">Barra de Confirmação</div>
+      <div class="status-bar">
+        <div class="seg green" style="width:36.8%"></div>
+        <div class="seg amber" style="width:5.1%"></div>
+        <div class="seg red" style="width:58.1%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--text-muted);">
+        <span>&#9679; Confirmado 36.8%</span>
+        <span>&#9679; Pendente ~0.2%</span>
+        <span>&#9679; Não Confirmado ~58.1%</span>
+      </div>
+      <div style="margin-top:10px;font-size:11px;color:var(--text-muted);font-style:italic;">
+        * Confirmado = 2.074 (segmento ActiveCampaign, campo [LI26] Status). Pendente = ~12 ainda na fila da automação Cadastrou. Não confirmados = ~3.567.
+      </div>
+    </div>
+
+    <!-- Funnel -->
+    <div class="section-title">Funil: Captação → Confirmação → Check-in</div>
+    <div class="chart-card full" style="margin-bottom:28px">
+      <div class="funnel">
+        <div class="funnel-step" style="width:92%;background:var(--blue-50);color:var(--blue-600)">
+          <div>
+            <div class="step-label">Leads Captados (Cadastrou)</div>
+            <div class="step-value">5.653</div>
+            <div class="step-rate">100% — entraram na automação</div>
+          </div>
+        </div>
+        <div class="funnel-arrow">&#9660;</div>
+        <div class="funnel-step" style="width:60%;background:var(--green-50);color:var(--green-600)">
+          <div>
+            <div class="step-label">Confirmados ([LI26] Status)</div>
+            <div class="step-value">2.074</div>
+            <div class="step-rate">36.7% — confirmaram optin</div>
+          </div>
+        </div>
+        <div class="funnel-arrow">&#9660;</div>
+        <div class="funnel-step" style="width:35%;background:var(--amber-50);color:var(--amber-600)">
+          <div>
+            <div class="step-label">Check-in no Evento</div>
+            <div class="step-value">659</div>
+            <div class="step-rate">11.66% dos leads &middot; 31.78% dos confirmados</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Daily -->
+    <div class="section-title">Evolução Diária de Captação</div>
+    <div class="charts-row">
+      <div class="chart-card full">
+        <div class="chart-title">Leads por Dia — Pago vs Orgânico</div>
+        <div class="chart-desc">Período completo: 03/Mar a 25/Mar 2026</div>
+        <div class="chart-wrapper h300"><canvas id="dailyLeadsChart"></canvas></div>
+      </div>
+    </div>
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-title">Distribuição por Fonte</div>
+        <div class="chart-desc">Origem dos leads cadastrados</div>
+        <div class="chart-wrapper h300"><canvas id="sourcePieChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Check-ins por Dia</div>
+        <div class="chart-desc">Evolução dos check-ins</div>
+        <div class="chart-wrapper h300"><canvas id="checkinChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =================== EMAIL MARKETING =================== -->
+  <div id="tab-email" class="tab-content">
+
+    <!-- Sub-tabs: Campanha vs Automação -->
+    <div class="sub-tabs">
+      <button class="sub-tab active" onclick="switchSub('campanhas',this)">Campanhas (One-Time)</button>
+      <button class="sub-tab" onclick="switchSub('automacoes',this)">Automações</button>
+      <button class="sub-tab" onclick="switchSub('visaogeral',this)">Visão Geral de E-mail</button>
+    </div>
+
+    <!-- SUB: CAMPANHAS -->
+    <div id="sub-campanhas" class="sub-panel active">
+      <div class="section-title">KPIs — Campanhas One-Time LI26</div>
+      <div class="kpi-grid">
+        <div class="kpi-card blue"><div class="kpi-icon blue">&#9993;</div><div class="kpi-label">Envios (Campanhas)</div><div class="kpi-value">93.4K</div><div class="kpi-sub">22 campanhas one-time enviadas</div></div>
+        <div class="kpi-card green"><div class="kpi-icon green">&#128065;</div><div class="kpi-label">Open Rate Médio</div><div class="kpi-value">12.6%</div><div class="kpi-sub">~7.979 aberturas únicas</div></div>
+        <div class="kpi-card amber"><div class="kpi-icon amber">&#128073;</div><div class="kpi-label">Click Rate Médio</div><div class="kpi-value">0.39%</div><div class="kpi-sub">~249 cliques</div></div>
+        <div class="kpi-card teal"><div class="kpi-icon teal">&#128279;</div><div class="kpi-label">CTO Médio</div><div class="kpi-value">3.12%</div><div class="kpi-sub">Cliques / Aberturas</div></div>
+      </div>
+
+      <div class="section-title">Campanhas One-Time — [LI26] [AQUECIMENTO] + [VENDA]</div>
+      <div class="data-table-wrapper">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+          <div>
+            <div class="chart-title">Campanhas LI26 — Nome AC + Assunto</div>
+            <div class="chart-desc" style="margin-bottom:0">Clique nos cabeçalhos para ordenar</div>
+          </div>
+          <div class="search-bar" style="margin-bottom:0;max-width:320px;flex:1;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="campSearch" placeholder="Filtrar campanhas..." oninput="filterTable('campTable',this.value)">
+          </div>
+        </div>
+        <table class="data-table" id="campTable">
+          <thead><tr>
+            <th onclick="sortTable('campTable',0)"># <span class="sort-icon">&#9650;&#9660;</span></th>
+            <th onclick="sortTable('campTable',1)">Nome da Campanha (AC) <span class="sort-icon">&#9650;&#9660;</span></th>
+            <th onclick="sortTable('campTable',2)">Data <span class="sort-icon">&#9650;&#9660;</span></th>
+            <th onclick="sortTable('campTable',3)">Envios <span class="sort-icon">&#9650;&#9660;</span></th>
+            <th onclick="sortTable('campTable',4)">Aberturas <span class="sort-icon">&#9650;&#9660;</span></th>
+            <th onclick="sortTable('campTable',5)">Cliques <span class="sort-icon">&#9650;&#9660;</span></th>
+            <th onclick="sortTable('campTable',6)">Open Rate <span class="sort-icon">&#9650;&#9660;</span></th>
+            <th onclick="sortTable('campTable',7)">CTO <span class="sort-icon">&#9650;&#9660;</span></th>
+            <th onclick="sortTable('campTable',8)">Click Rate <span class="sort-icon">&#9650;&#9660;</span></th>
+            <th onclick="sortTable('campTable',9)">Unsub% <span class="sort-icon">&#9650;&#9660;</span></th>
+            <th onclick="sortTable('campTable',10)">Bounce% <span class="sort-icon">&#9650;&#9660;</span></th>
+          </tr></thead>
+          <tbody>
+            <tr style="background:#ECFDF5;"><td class="mono">50</td><td class="campaign-name">[50] [VENDA] Bônus exclusivo<span class="ac-name">Assunto: Bônus exclusivos só pra você!</span></td><td class="mono">30/03</td><td class="mono">1.969</td><td class="mono">423</td><td class="mono">14</td><td class="mono metric-good">21,48%</td><td class="mono">3,31%</td><td class="mono">0,71%</td><td class="mono">0,41%</td><td class="mono">0,25%</td></tr>
+            <tr style="background:#ECFDF5;"><td class="mono">49</td><td class="campaign-name">[49] [VENDA] A melhor condição...<span class="ac-name">Assunto: A melhor condição para entrar no DevQuest foi liberada!</span></td><td class="mono">29/03</td><td class="mono">4.895</td><td class="mono">345</td><td class="mono">12</td><td class="mono metric-bad">7,05%</td><td class="mono">3,48%</td><td class="mono">0,25%</td><td class="mono">0,12%</td><td class="mono">0,22%</td></tr>
+            <tr style="background:#ECFDF5;"><td class="mono">48</td><td class="campaign-name">[48] [VENDA] Matrículas abertas!<span class="ac-name">Assunto: Matrículas abertas para o DevQuest!</span></td><td class="mono">29/03</td><td class="mono">4.897</td><td class="mono">461</td><td class="mono">16</td><td class="mono metric-bad">9,41%</td><td class="mono">3,47%</td><td class="mono">0,33%</td><td class="mono">0,08%</td><td class="mono">0,22%</td></tr>
+            <tr style="background:#EFF6FF;"><td class="mono">48</td><td class="campaign-name">[48] [LISTA DE ESPERA] [VENDA] Matrículas<span class="ac-name">Assunto: Matrículas abertas para o DevQuest! (Lista de Espera)</span></td><td class="mono">29/03</td><td class="mono">841</td><td class="mono">145</td><td class="mono">8</td><td class="mono metric-good">17,24%</td><td class="mono">5,52%</td><td class="mono">0,95%</td><td class="mono">0,24%</td><td class="mono">0,48%</td></tr>
+            <tr><td class="mono">47</td><td class="campaign-name">[47] [AQUECIMENTO] AO VIVO — DevQuest!<span class="ac-name">Assunto: VENHA CONHECER O DEVQUEST — AO VIVO!</span></td><td class="mono">29/03</td><td class="mono">4.908</td><td class="mono">476</td><td class="mono">18</td><td class="mono metric-bad">9,70%</td><td class="mono">3,78%</td><td class="mono">0,37%</td><td class="mono">0,06%</td><td class="mono">0,26%</td></tr>
+            <tr><td class="mono">46</td><td class="campaign-name">[46] [AQUECIMENTO] Vamos juntos?<span class="ac-name">Assunto: Vamos juntos nessa jornada?</span></td><td class="mono">29/03</td><td class="mono">1.818</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td></tr>
+            <tr><td class="mono">45</td><td class="campaign-name">[45] [AQUECIMENTO] Quer mudar de vida?<span class="ac-name">Assunto: Quer mudar de vida com programação?</span></td><td class="mono">28/03</td><td class="mono">4.928</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td></tr>
+            <tr><td class="mono">44</td><td class="campaign-name">[44] [AQUECIMENTO] AO VIVO<span class="ac-name">Assunto: AO VIVO — não perca</span></td><td class="mono">28/03</td><td class="mono">4.931</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td></tr>
+            <tr><td class="mono">43</td><td class="campaign-name">[43] [AQUECIMENTO] Ainda dá tempo<span class="ac-name">Assunto: Ainda dá tempo de participar</span></td><td class="mono">28/03</td><td class="mono">1.822</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td></tr>
+            <tr><td class="mono">37</td><td class="campaign-name">[37] AS AULAS VÃO SAIR DO AR!<span class="ac-name">Assunto: AS AULAS estão chegando... Você está pronto(a)?</span></td><td class="mono">25/03</td><td class="mono">4.858</td><td class="mono">525</td><td class="mono">50</td><td class="mono metric-bad">10.81%</td><td class="mono">9.52%</td><td class="mono">1.03%</td><td class="mono">0.16%</td><td class="mono">0.16%</td></tr>
+            <tr><td class="mono">36</td><td class="campaign-name">[36] Veja o que já rolou no evento até agora.<span class="ac-name">Assunto: Veja o que já preparamos pra você</span></td><td class="mono">25/03</td><td class="mono">4.870</td><td class="mono">561</td><td class="mono">34</td><td class="mono metric-bad">11.52%</td><td class="mono">6.06%</td><td class="mono">0.70%</td><td class="mono">0.12%</td><td class="mono">0.27%</td></tr>
+            <tr><td class="mono">35</td><td class="campaign-name">[35] Se eles conseguiram, tu também pode!<span class="ac-name">Assunto: Se eles conseguiram, você também consegue!</span></td><td class="mono">23/03</td><td class="mono">4.840</td><td class="mono">502</td><td class="mono">33</td><td class="mono metric-bad">10.37%</td><td class="mono">6.57%</td><td class="mono">0.68%</td><td class="mono">0.23%</td><td class="mono">0.39%</td></tr>
+            <tr><td class="mono">34</td><td class="campaign-name">[34] A aula 1 já tá no ar! E ainda dá tempo de assistir!<span class="ac-name">Assunto: A aula 1 já tá pronta — bora aprender?</span></td><td class="mono">23/03</td><td class="mono">4.841</td><td class="mono">504</td><td class="mono">46</td><td class="mono metric-bad">10.41%</td><td class="mono">9.13%</td><td class="mono">0.95%</td><td class="mono">0.08%</td><td class="mono">0.37%</td></tr>
+            <tr><td class="mono">27</td><td class="campaign-name">[27] %FIRSTNAME%, seu ingresso está te esperando!<span class="ac-name">Assunto: %FIRSTNAME%, lembrete: sua vaga está reservada!</span></td><td class="mono">22/03</td><td class="mono">4.337</td><td class="mono">535</td><td class="mono">57</td><td class="mono metric-bad">12.34%</td><td class="mono metric-good">10.65%</td><td class="mono">1.31%</td><td class="mono">0.12%</td><td class="mono">0.35%</td></tr>
+            <tr><td class="mono">26</td><td class="campaign-name">[26] IMPORTANTE: O evento começa amanhã!<span class="ac-name">Assunto: IMPORTANTE: Participe da comunidade do Discord</span></td><td class="mono">22/03</td><td class="mono">4.326</td><td class="mono">619</td><td class="mono">22</td><td class="mono metric-avg">14.31%</td><td class="mono">3.55%</td><td class="mono">0.51%</td><td class="mono">0.05%</td><td class="mono">0.42%</td></tr>
+            <tr><td class="mono">26</td><td class="campaign-name">[26] Participe do sorteio e concorra a um notebook!<span class="ac-name">Assunto: Participe da comunidade exclusiva da Semana ZP</span></td><td class="mono">21/03</td><td class="mono">3.957</td><td class="mono">488</td><td class="mono">0</td><td class="mono metric-bad">12.33%</td><td class="mono metric-bad">0.00%</td><td class="mono metric-bad">0.00%</td><td class="mono">0.13%</td><td class="mono">0.28%</td></tr>
+            <tr><td class="mono">25</td><td class="campaign-name">[25] Garanta seu certificado<span class="ac-name">Assunto: Pegue seu presente especial — Guia do Programador</span></td><td class="mono">21/03</td><td class="mono">3.897</td><td class="mono">464</td><td class="mono">7</td><td class="mono metric-bad">11.91%</td><td class="mono">1.51%</td><td class="mono">0.18%</td><td class="mono">0.10%</td><td class="mono">0.26%</td></tr>
+            <tr><td class="mono">24</td><td class="campaign-name">[24] Pegue seu Ticket para o Evento!<span class="ac-name">Assunto: Seu presente está aqui — Baixe o Guia Completo</span></td><td class="mono">21/03</td><td class="mono">3.815</td><td class="mono">549</td><td class="mono">72</td><td class="mono metric-avg">14.39%</td><td class="mono metric-good">13.11%</td><td class="mono">1.89%</td><td class="mono">0.13%</td><td class="mono">0.34%</td></tr>
+            <tr><td class="mono">23</td><td class="campaign-name">[23] AO VIVO: A última live de aquecimento vai começar!<span class="ac-name">Assunto: AO VIVO: A tríade para se tornar programador</span></td><td class="mono">20/03</td><td class="mono">3.533</td><td class="mono">401</td><td class="mono">22</td><td class="mono metric-bad">11.35%</td><td class="mono">5.49%</td><td class="mono">0.62%</td><td class="mono">0.23%</td><td class="mono">0.28%</td></tr>
+            <tr><td class="mono">22</td><td class="campaign-name">[22] HOJE: Começou do ZERO e hoje trabalha HOME OFFICE<span class="ac-name">Assunto: HOJE: Começa a Semana do Zero ao Programador!</span></td><td class="mono">20/03</td><td class="mono">3.401</td><td class="mono">512</td><td class="mono">11</td><td class="mono metric-avg">15.05%</td><td class="mono">2.15%</td><td class="mono">0.32%</td><td class="mono">0.18%</td><td class="mono">0.29%</td></tr>
+            <tr><td class="mono">21</td><td class="campaign-name">[21] A TRÍADE perfeita: PLANO + MARKETING + IA<span class="ac-name">Assunto: A TRÍADE para programar do zero — amanhã ao vivo!</span></td><td class="mono">19/03</td><td class="mono">3.194</td><td class="mono">392</td><td class="mono">10</td><td class="mono metric-bad">12.27%</td><td class="mono">2.55%</td><td class="mono">0.31%</td><td class="mono">0.19%</td><td class="mono">0.19%</td></tr>
+            <tr><td class="mono">20</td><td class="campaign-name">[20] Hoje: O combo perfeito pra ser contratado como dev<span class="ac-name">Assunto: Hoje: O que vai acontecer na Semana ZP</span></td><td class="mono">19/03</td><td class="mono">3.151</td><td class="mono">447</td><td class="mono">4</td><td class="mono metric-avg">14.19%</td><td class="mono">0.89%</td><td class="mono">0.13%</td><td class="mono">0.19%</td><td class="mono">0.25%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SUB: AUTOMAÇÕES -->
+    <div id="sub-automacoes" class="sub-panel">
+      <div class="section-title">KPIs — E-mails de Automação LI26</div>
+      <div class="kpi-grid">
+        <div class="kpi-card blue"><div class="kpi-icon blue">&#9993;</div><div class="kpi-label">Envios (Automações)</div><div class="kpi-value">28.1K</div><div class="kpi-sub">6 e-mails automatizados</div></div>
+        <div class="kpi-card green"><div class="kpi-icon green">&#128065;</div><div class="kpi-label">Open Rate Médio</div><div class="kpi-value">20.1%</div><div class="kpi-sub">~5.644 aberturas únicas</div></div>
+        <div class="kpi-card amber"><div class="kpi-icon amber">&#128073;</div><div class="kpi-label">Click Rate Médio</div><div class="kpi-value">1.85%</div><div class="kpi-sub">~518 cliques</div></div>
+        <div class="kpi-card teal"><div class="kpi-icon teal">&#128279;</div><div class="kpi-label">CTO Médio</div><div class="kpi-value">9.2%</div><div class="kpi-sub">Cliques / Aberturas</div></div>
+      </div>
+
+      <div class="section-title">Status das Automações LI26</div>
+      <div class="auto-grid">
+        <div class="auto-card"><div class="auto-status active"></div><div class="auto-info"><div class="auto-name">[SZP] [LI26] Cadastrou</div><div class="auto-desc">Boas-vindas + confirmação de optin (4 e-mails)</div></div><div class="auto-count-wrap"><div class="auto-count">5.653</div><div class="auto-count-label">entraram</div></div></div>
+        <div class="auto-card"><div class="auto-status active"></div><div class="auto-info"><div class="auto-name">[SZP] [LI26] Engajamento</div><div class="auto-desc">2 e-mails de introdução pós optin</div></div><div class="auto-count-wrap"><div class="auto-count">5.645</div><div class="auto-count-label">entraram</div></div></div>
+        <div class="auto-card"><div class="auto-status active"></div><div class="auto-info"><div class="auto-name">[SZP] [LI26] Check-in</div><div class="auto-desc">Gestão de check-in do evento</div></div><div class="auto-count-wrap"><div class="auto-count">659</div><div class="auto-count-label">entraram</div></div></div>
+        <div class="auto-card"><div class="auto-status active"></div><div class="auto-info"><div class="auto-name">[SZP] [LI26] Respondeu Pesquisa</div><div class="auto-desc">Pesquisa de perfil do evento</div></div><div class="auto-count-wrap"><div class="auto-count" style="color:var(--green-600);">1.441</div><div class="auto-count-label">entraram</div></div></div>
+        <div class="auto-card"><div class="auto-status active"></div><div class="auto-info"><div class="auto-name">[DQ] [LI26] Compra Aprovada</div><div class="auto-desc">Onboarding pós-compra</div></div><div class="auto-count-wrap"><div class="auto-count" style="color:var(--green-600);">36</div><div class="auto-count-label">compradores</div></div></div>
+        <div class="auto-card"><div class="auto-status active"></div><div class="auto-info"><div class="auto-name">[DQ] [LI26] Carrinho Abandonado</div><div class="auto-desc">Recuperação de carrinho</div></div><div class="auto-count-wrap"><div class="auto-count" style="color:var(--amber-600);">28</div><div class="auto-count-label">contatos</div></div></div>
+        <div class="auto-card"><div class="auto-status active"></div><div class="auto-info"><div class="auto-name">[DQ] [LI26] Compra Cancelada</div><div class="auto-desc">Reembolsos e cancelamentos</div></div><div class="auto-count-wrap"><div class="auto-count" style="color:var(--red-600);">8</div><div class="auto-count-label">cancelados</div></div></div>
+      </div>
+
+      <div class="section-title">Desempenho dos E-mails de Automação</div>
+      <div class="data-table-wrapper">
+        <table class="data-table" id="autoTable">
+          <thead><tr>
+            <th>Automação</th>
+            <th>E-mail / Assunto</th>
+            <th onclick="sortTable('autoTable',2)">Envios <span class="sort-icon">&#9650;&#9660;</span></th>
+            <th onclick="sortTable('autoTable',3)">Aberturas <span class="sort-icon">&#9650;&#9660;</span></th>
+            <th onclick="sortTable('autoTable',4)">Cliques <span class="sort-icon">&#9650;&#9660;</span></th>
+            <th onclick="sortTable('autoTable',5)">Open Rate <span class="sort-icon">&#9650;&#9660;</span></th>
+            <th onclick="sortTable('autoTable',6)">CTO <span class="sort-icon">&#9650;&#9660;</span></th>
+            <th onclick="sortTable('autoTable',7)">Click Rate <span class="sort-icon">&#9650;&#9660;</span></th>
+            <th onclick="sortTable('autoTable',8)">Bounce% <span class="sort-icon">&#9650;&#9660;</span></th>
+          </tr></thead>
+          <tbody>
+            <tr><td><span class="type-badge cad">CAD</span></td><td class="campaign-name">[01] Boas-vindas à Semana ZP<span class="ac-name">Assunto: %FIRSTNAME%, agora é a hora!</span></td><td class="mono">5.454</td><td class="mono">1.320</td><td class="mono">245</td><td class="mono metric-good">24.20%</td><td class="mono metric-good">18.56%</td><td class="mono metric-good">4.50%</td><td class="mono metric-bad">1.98%</td></tr>
+            <tr><td><span class="type-badge cad">CAD</span></td><td class="campaign-name">[02] Confirmação de inscrição<span class="ac-name">Assunto: Abra pra confirmar sua inscrição</span></td><td class="mono">4.641</td><td class="mono">937</td><td class="mono">139</td><td class="mono metric-good">20.20%</td><td class="mono metric-good">14.83%</td><td class="mono metric-good">3.00%</td><td class="mono metric-bad">1.40%</td></tr>
+            <tr><td><span class="type-badge cad">CAD</span></td><td class="campaign-name">[03] Lembrete de confirmação<span class="ac-name">Assunto: NOME? %FIRSTNAME%?</span></td><td class="mono">3.928</td><td class="mono">613</td><td class="mono">43</td><td class="mono metric-avg">15.60%</td><td class="mono">7.01%</td><td class="mono">1.10%</td><td class="mono metric-bad">1.55%</td></tr>
+            <tr><td><span class="type-badge cad">CAD</span></td><td class="campaign-name">[04] Última chance de confirmação<span class="ac-name">Assunto: Só abrir aqui pra confirmar</span></td><td class="mono">3.500</td><td class="mono">438</td><td class="mono">23</td><td class="mono metric-bad">12.50%</td><td class="mono">5.25%</td><td class="mono">0.66%</td><td class="mono metric-bad">0.60%</td></tr>
+            <tr><td><span class="type-badge eng">ENG</span></td><td class="campaign-name">[01] Conheça nossa história<span class="ac-name">Assunto: Conheça nossa história e a Semana ZP</span></td><td class="mono">5.333</td><td class="mono">1.205</td><td class="mono">0</td><td class="mono metric-good">22.60%</td><td class="mono metric-bad">0.00%</td><td class="mono metric-bad">0.00%</td><td class="mono">0.04%</td></tr>
+            <tr><td><span class="type-badge eng">ENG</span></td><td class="campaign-name">[02] Entre na comunidade<span class="ac-name">Assunto: Entre na comunidade do Discord</span></td><td class="mono">5.210</td><td class="mono">1.131</td><td class="mono">68</td><td class="mono metric-good">21.70%</td><td class="mono">6.01%</td><td class="mono metric-good">1.30%</td><td class="mono">0.06%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SUB: VISÃO GERAL EMAIL -->
+    <div id="sub-visaogeral" class="sub-panel">
+      <div class="section-title">KPIs Consolidados — Todos os E-mails LI26</div>
+      <div class="kpi-grid">
+        <div class="kpi-card blue"><div class="kpi-icon blue">&#9993;</div><div class="kpi-label">Total de Envios</div><div class="kpi-value">91.4K</div><div class="kpi-sub">Campanhas + automações</div></div>
+        <div class="kpi-card green"><div class="kpi-icon green">&#128065;</div><div class="kpi-label">Taxa de Abertura</div><div class="kpi-value">14.2%</div><div class="kpi-sub">~12.988 aberturas únicas</div></div>
+        <div class="kpi-card amber"><div class="kpi-icon amber">&#128073;</div><div class="kpi-label">Taxa de Clique</div><div class="kpi-value">0.97%</div><div class="kpi-sub">~886 cliques totais</div></div>
+        <div class="kpi-card red"><div class="kpi-icon red">&#10005;</div><div class="kpi-label">Cancelamentos</div><div class="kpi-value">~129</div><div class="kpi-sub"><span class="down">0.15% taxa de cancelamento</span></div></div>
+      </div>
+
+      <div class="section-title">Volume de Envios e Taxas Diárias</div>
+      <div class="charts-row">
+        <div class="chart-card full">
+          <div class="chart-title">Envios/Dia × Open Rate × Click Rate</div>
+          <div class="chart-desc">Valores exibidos diretamente nas linhas</div>
+          <div class="chart-wrapper h400"><canvas id="emailDayChart"></canvas></div>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="chart-title">Open Rate por E-mail</div>
+          <div class="chart-desc">Todos os e-mails LI26 ordenados por open rate</div>
+          <div class="chart-wrapper h400"><canvas id="openRateChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">CTO (Click-to-Open) por E-mail</div>
+          <div class="chart-desc">Quem abre, clica? Maior = melhor CTA</div>
+          <div class="chart-wrapper h400"><canvas id="ctoChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =================== FONTES DE CAPTAÇÃO =================== -->
+  <div id="tab-captacao" class="tab-content">
+
+    <!-- Daily leads line chart -->
+    <div class="section-title">Evolução Diária de Leads Captados</div>
+    <div class="charts-row">
+      <div class="chart-card full">
+        <div class="chart-title">Leads Captados por Dia</div>
+        <div class="chart-desc">Linha de tendência: total de leads por dia (pago + orgânico)</div>
+        <div class="chart-wrapper h300"><canvas id="dailyLeadsLineChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="section-title">Fontes de Captação</div>
+    <div class="kpi-grid">
+      <div class="kpi-card blue"><div class="kpi-icon blue">&#128176;</div><div class="kpi-label">Facebook Ads</div><div class="kpi-value">4.802</div><div class="kpi-sub">87.6% do total</div></div>
+      <div class="kpi-card purple"><div class="kpi-icon purple">&#128247;</div><div class="kpi-label">Instagram</div><div class="kpi-value">170</div><div class="kpi-sub">3.1% do total</div></div>
+      <div class="kpi-card red"><div class="kpi-icon red">&#9654;</div><div class="kpi-label">YouTube</div><div class="kpi-value">127</div><div class="kpi-sub">2.3% do total</div></div>
+      <div class="kpi-card amber"><div class="kpi-icon amber">&#128172;</div><div class="kpi-label">ManyChat</div><div class="kpi-value">81</div><div class="kpi-sub">1.5% do total</div></div>
+      <div class="kpi-card teal"><div class="kpi-icon teal">&#9993;</div><div class="kpi-label">ActiveCampaign</div><div class="kpi-value">70</div><div class="kpi-sub">1.3% reativação</div></div>
+      <div class="kpi-card green"><div class="kpi-icon green">&#10067;</div><div class="kpi-label">Sem UTM / Outros</div><div class="kpi-value">229</div><div class="kpi-sub">4.2% sem rastreio</div></div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-card full">
+        <div class="chart-title">Distribuição Completa por Fonte</div>
+        <div class="chart-desc">Todas as fontes com volume e percentual</div><br>
+        <div class="source-bar-list" id="sourceBarList"></div>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="chart-card"><div class="chart-title">Posicionamento dos Anúncios</div><div class="chart-desc">Onde os anúncios mais convertem</div><div class="chart-wrapper h300"><canvas id="placementChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">Públicos de Anúncio</div><div class="chart-desc">Segmentação no Facebook Ads</div><div class="chart-wrapper h300"><canvas id="audienceChart"></canvas></div></div>
+    </div>
+
+    <div class="section-title">Fontes → Check-in</div>
+    <div class="charts-row">
+      <div class="chart-card"><div class="chart-title">Check-ins por Fonte</div><div class="chart-desc">Origem dos check-ins</div><div class="chart-wrapper h300"><canvas id="checkinSourceChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">Taxa de Conversão por Fonte</div><div class="chart-desc">Check-ins / Leads por fonte</div><div class="chart-wrapper h300"><canvas id="conversionRateChart"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- =================== INSIGHTS & VENDAS =================== -->
+  <div id="tab-insights" class="tab-content">
+    <div class="section-title">Insights do Lançamento — Aprendizados para LI27</div>
+    <div class="insights-grid">
+      <div class="insight-card border-purple full">
+        <div class="insight-type sales">RESULTADO FINAL — LANÇAMENTO CONCLUÍDO</div>
+        <div class="insight-title">Resultado Final: 5.653 leads, 2.074 confirmados — 36 compradores</div>
+        <div class="insight-body">Base de 5.653 leads com 2.074 confirmados (36.7%). Lançamento encerrado com <strong>36 compras aprovadas</strong> (28 ativas após 8 cancelamentos) e 28 carrinhos abandonados não convertidos. Oportunidade: reativar os 28 carrinhos com campanha de recuperação para o próximo lançamento.</div>
+      </div>
+      <div class="insight-card border-red">
+        <div class="insight-type critical">APRENDIZADO CRÍTICO</div>
+        <div class="insight-title">63% Não Confirmados — Segmente no Próximo Lançamento</div>
+        <div class="insight-body">~3.567 leads não confirmaram optin (63% da base). Para o próximo lançamento, segmente desde o início: (1) confirmados engajados = oferta direta, (2) confirmados frios = escassez/urgência, (3) não confirmados = iscas como bônus exclusivo. Cada segmento precisa de copy diferente.</div>
+      </div>
+      <div class="insight-card border-red">
+        <div class="insight-type positive">PONTO FORTE</div>
+        <div class="insight-title">659 Check-ins — Público VIP para o Próximo Lançamento</div>
+        <div class="insight-body">Os 659 que fizeram check-in são o público mais quente — ativar primeiro em LI27. Para o próximo lançamento, crie lista separada e envie a oferta 5–10 minutos antes da base geral. No LI26, esse segmento teve a maior taxa de conversão relativa.</div>
+      </div>
+      <div class="insight-card border-amber">
+        <div class="insight-type warning">OPORTUNIDADE DE VENDAS</div>
+        <div class="insight-title">Automações performam 2x melhor que Campanhas</div>
+        <div class="insight-body">E-mails de automação têm 20.1% open rate vs 12.6% das campanhas. Para vendas, use assuntos no padrão das automações: curtos, com %FIRSTNAME%, e com verbo de ação. Melhores: "Boas-vindas" (24.2%), "Conheça nossa história" (22.6%), "Entre na comunidade" (21.7%).</div>
+      </div>
+      <div class="insight-card border-amber">
+        <div class="insight-type warning">OPORTUNIDADE DE VENDAS</div>
+        <div class="insight-title">Campanha "Abra pra confirmar" = Template de Venda</div>
+        <div class="insight-body">CTO de 15.0% e 3.0% click rate — a melhor campanha. O padrão: verbo de ação + urgência implícita. Para vendas: "Abra pra garantir o desconto", "%FIRSTNAME%, sua vaga tá reservada".</div>
+      </div>
+      <div class="insight-card border-green">
+        <div class="insight-type positive">PONTO FORTE</div>
+        <div class="insight-title">ManyChat = Canal de Ouro (~100% conversão check-in)</div>
+        <div class="insight-body">81 leads com 80 check-ins (98.8%). Na semana de vendas, priorize ManyChat: lembretes de oferta no DM, automação de comentários nos posts de venda, contagem regressiva.</div>
+      </div>
+      <div class="insight-card border-blue">
+        <div class="insight-type info">SEQUÊNCIA DE VENDAS SUGERIDA</div>
+        <div class="insight-title">Plano de E-mails: Domingo a Quarta</div>
+        <div class="insight-body"><strong>Domingo (D-Day):</strong> E-mail 1 — Abertura de carrinho (VIPs primeiro). E-mail 2 — Lembrete + depoimento.<br><strong>Segunda:</strong> E-mail 3 — Prova social. E-mail 4 — FAQ.<br><strong>Terça:</strong> E-mail 5 — Bônus exclusivo. E-mail 6 — Contagem regressiva (48h).<br><strong>Quarta:</strong> E-mail 7 — Último dia. E-mail 8 — "Carrinho fecha em X horas".</div>
+      </div>
+      <div class="insight-card border-blue">
+        <div class="insight-type info">INSIGHT DE DADOS</div>
+        <div class="insight-title">2 E-mails com 0 Cliques — Corrigir para Vendas</div>
+        <div class="insight-body">"Conheça nossa história" (23.0% open, 0 cliques) e "Participe do sorteio" (12.3%, 0 cliques) não têm CTA ou link. Para vendas, TODOS os e-mails devem ter 2-3 CTAs claros (botão + link no texto + PS).</div>
+      </div>
+    </div>
+
+    <div class="section-title">Plano de Ação — Próximo Lançamento (LI27)</div>
+    <div class="data-table-wrapper">
+      <table class="data-table">
+        <thead><tr><th>Prioridade</th><th>Quando</th><th>Ação</th><th>Impacto Esperado</th></tr></thead>
+        <tbody>
+          <tr><td><span class="priority-badge urgent">URGENTE</span></td><td class="mono">LI27</td><td class="campaign-name">Reativar os 28 carrinhos abandonados do LI26 com campanha específica</td><td>Recuperar receita deixada na mesa — público já qualificado</td></tr>
+          <tr><td><span class="priority-badge urgent">URGENTE</span></td><td class="mono">LI27</td><td class="campaign-name">Criar lista VIP com os 659 check-ins do LI26</td><td>Ativar público mais quente antes do restante da base</td></tr>
+          <tr><td><span class="priority-badge urgent">URGENTE</span></td><td class="mono">LI27</td><td class="campaign-name">Investigar causa dos 8 cancelamentos — padrão de perfil</td><td>Reduzir churn no próximo lançamento</td></tr>
+          <tr><td><span class="priority-badge high">ALTA</span></td><td class="mono">LI27</td><td class="campaign-name">Melhorar open rate das campanhas de venda (média 7–10% vs automações 20%)</td><td>Campanhas de venda performaram 2x abaixo das automações</td></tr>
+          <tr><td><span class="priority-badge high">ALTA</span></td><td class="mono">LI27</td><td class="campaign-name">Criar automação ManyChat para vendas — replicar 98.8% de check-in</td><td>Converter leads mais quentes via canal de maior engajamento</td></tr>
+          <tr><td><span class="priority-badge high">ALTA</span></td><td class="mono">LI27</td><td class="campaign-name">Ativar segmento de 1.441 respondentes da pesquisa como lista quente</td><td>Engajamento altíssimo — conversão superior esperada</td></tr>
+          <tr><td><span class="priority-badge medium">MÉDIA</span></td><td class="mono">Sempre</td><td class="campaign-name">Garantir UTM em TODOS os links de venda e rastrear conversões</td><td>9 compradores sem source identificada no LI26</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- =================== COMPRADORES =================== -->
+  <div id="tab-compradores" class="tab-content">
+
+    <!-- ===== KPI Cards ===== -->
+    <div class="section-title">Visão Geral dos Compradores</div>
+    <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));">
+      <div class="kpi-card blue">
+        <div class="kpi-label">Total Compradores</div>
+        <div class="kpi-value">36</div>
+        <div class="kpi-sub">Automação [DQ][LI26] Compra Aprovada</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-label">Ativos (Líquido)</div>
+        <div class="kpi-value">28</div>
+        <div class="kpi-sub"><span class="up">36 aprovadas − 8 canceladas</span></div>
+      </div>
+      <div class="kpi-card red">
+        <div class="kpi-label">Cancelamentos</div>
+        <div class="kpi-value">8</div>
+        <div class="kpi-sub"><span class="down">22.2% das aprovadas</span></div>
+      </div>
+      <div class="kpi-card amber">
+        <div class="kpi-label">Carrinhos Abandonados</div>
+        <div class="kpi-value">28</div>
+        <div class="kpi-sub">Iniciaram checkout s/ concluir</div>
+      </div>
+      <div class="kpi-card purple">
+        <div class="kpi-label">Tier A — Top</div>
+        <div class="kpi-value">4 <small style="font-size:13px;color:var(--text-secondary)">(14%)</small></div>
+        <div class="kpi-sub">Lead Score mais alto</div>
+      </div>
+      <div class="kpi-card teal">
+        <div class="kpi-label">Pico de Vendas</div>
+        <div class="kpi-value">20h–21h</div>
+        <div class="kpi-sub">9 das 16 compras do Dia 1</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-label">Responderam Pesquisa</div>
+        <div class="kpi-value">11 <small style="font-size:13px;color:var(--text-secondary)">(31%)</small></div>
+        <div class="kpi-sub">11 de 36 preencheram [LI26][PESQ]</div>
+      </div>
+      <div class="kpi-card blue">
+        <div class="kpi-label">Facebook Ads</div>
+        <div class="kpi-value">38% <small style="font-size:13px;color:var(--text-secondary)">11</small></div>
+        <div class="kpi-sub">Canal líder de compras</div>
+      </div>
+    </div>
+
+    <!-- ===== Tabela de Compradores ===== -->
+    <div class="section-title" style="margin-top:8px;">Compradores com Dados Detalhados (29 de 36)</div>
+    <div style="background:var(--amber-50);border:1px solid var(--amber-100);border-left:4px solid var(--amber-500);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--amber-600);">
+      <strong>7 compradores adicionais</strong> registrados após o fechamento do relatório inicial (30/03). Dados detalhados não disponíveis — contabilizados nos KPIs acima.
+    </div>
+    <div class="search-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" placeholder="Buscar por nome, email, source, estado..." oninput="filterTable('buyersTable', this.value)">
+    </div>
+    <div class="data-table-wrapper" style="margin-bottom:32px;">
+      <table class="data-table" id="buyersTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable('buyersTable',0)" style="cursor:pointer">#</th>
+            <th onclick="sortTable('buyersTable',1)" style="cursor:pointer">Nome</th>
+            <th onclick="sortTable('buyersTable',2)" style="cursor:pointer">Data Compra</th>
+            <th onclick="sortTable('buyersTable',3)" style="cursor:pointer">Horário</th>
+            <th onclick="sortTable('buyersTable',4)" style="cursor:pointer">Tier</th>
+            <th onclick="sortTable('buyersTable',5)" style="cursor:pointer">Dias até compra</th>
+            <th onclick="sortTable('buyersTable',6)" style="cursor:pointer">Pesquisa</th>
+            <th onclick="sortTable('buyersTable',7)" style="cursor:pointer">Source</th>
+            <th onclick="sortTable('buyersTable',8)" style="cursor:pointer">Estado</th>
+            <th onclick="sortTable('buyersTable',9)" style="cursor:pointer">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="mono">1</td><td class="campaign-name">Gabriel Santos</td><td class="mono">29/03</td><td class="mono">19:54</td><td><span class="tier-badge tier-c">C</span></td><td class="mono">7d</td><td><span class="status-dot green"></span>Sim</td><td>Facebook Ads</td><td>RJ</td><td>—</td></tr>
+          <tr><td class="mono">2</td><td class="campaign-name">Eric souza lima</td><td class="mono">29/03</td><td class="mono">20:27</td><td><span class="tier-badge tier-none">—</span></td><td class="mono">0d</td><td><span class="status-dot red"></span>Não</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td class="mono">3</td><td class="campaign-name">David miranda</td><td class="mono">29/03</td><td class="mono">20:32</td><td><span class="tier-badge tier-c">C</span></td><td class="mono">21d</td><td><span class="status-dot red"></span>Não</td><td>Instagram</td><td>—</td><td>—</td></tr>
+          <tr><td class="mono">4</td><td class="campaign-name">Ana lopes</td><td class="mono">29/03</td><td class="mono">20:38</td><td><span class="tier-badge tier-c">C</span></td><td class="mono">5d</td><td><span class="status-dot green"></span>Sim</td><td>YouTube</td><td>Outro país</td><td>Confirmado</td></tr>
+          <tr><td class="mono">5</td><td class="campaign-name">Leonardo</td><td class="mono">29/03</td><td class="mono">20:40</td><td><span class="tier-badge tier-c">C</span></td><td class="mono">19d</td><td><span class="status-dot red"></span>Não</td><td>Facebook Ads</td><td>—</td><td>—</td></tr>
+          <tr><td class="mono">6</td><td class="campaign-name">Miguel Maturana Neto</td><td class="mono">29/03</td><td class="mono">20:40</td><td><span class="tier-badge tier-a">A</span></td><td class="mono">13d</td><td><span class="status-dot green"></span>Sim</td><td>Facebook Ads</td><td>SP</td><td>—</td></tr>
+          <tr><td class="mono">7</td><td class="campaign-name">Marcos</td><td class="mono">29/03</td><td class="mono">20:42</td><td><span class="tier-badge tier-c">C</span></td><td class="mono">6d</td><td><span class="status-dot red"></span>Não</td><td>YouTube</td><td>—</td><td>—</td></tr>
+          <tr><td class="mono">8</td><td class="campaign-name">DANIEL DE SOUSA FEITOSA</td><td class="mono">29/03</td><td class="mono">20:43</td><td><span class="tier-badge tier-c">C</span></td><td class="mono">11d</td><td><span class="status-dot red"></span>Não</td><td>YouTube</td><td>—</td><td>—</td></tr>
+          <tr><td class="mono">9</td><td class="campaign-name">Anderson Luiz Oliveira da Silva</td><td class="mono">29/03</td><td class="mono">20:44</td><td><span class="tier-badge tier-b">B</span></td><td class="mono">10d</td><td><span class="status-dot red"></span>Não</td><td>Facebook Ads</td><td>—</td><td>—</td></tr>
+          <tr><td class="mono">10</td><td class="campaign-name">Diego Queiroz</td><td class="mono">29/03</td><td class="mono">20:54</td><td><span class="tier-badge tier-a">A</span></td><td class="mono">6d</td><td><span class="status-dot red"></span>Não</td><td>Instagram</td><td>SP</td><td>—</td></tr>
+          <tr><td class="mono">11</td><td class="campaign-name">KAUA TODA</td><td class="mono">29/03</td><td class="mono">21:05</td><td><span class="tier-badge tier-none">—</span></td><td class="mono">24d</td><td><span class="status-dot red"></span>Não</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td class="mono">12</td><td class="campaign-name">Ismael</td><td class="mono">29/03</td><td class="mono">21:28</td><td><span class="tier-badge tier-b">B</span></td><td class="mono">8d</td><td><span class="status-dot green"></span>Sim</td><td>Facebook Ads</td><td>SC</td><td>Confirmado</td></tr>
+          <tr><td class="mono">13</td><td class="campaign-name">Maria Geovana Gonçalo de Oliveira</td><td class="mono">29/03</td><td class="mono">21:32</td><td><span class="tier-badge tier-c">C</span></td><td class="mono">23d</td><td><span class="status-dot green"></span>Sim</td><td>ActiveCampaign</td><td>PB</td><td>Confirmado</td></tr>
+          <tr><td class="mono">14</td><td class="campaign-name">João Paulo</td><td class="mono">29/03</td><td class="mono">21:40</td><td><span class="tier-badge tier-c">C</span></td><td class="mono">21d</td><td><span class="status-dot green"></span>Sim</td><td>Facebook Ads</td><td>PA</td><td>Confirmado</td></tr>
+          <tr><td class="mono">15</td><td class="campaign-name">Yan</td><td class="mono">29/03</td><td class="mono">22:04</td><td><span class="tier-badge tier-c">C</span></td><td class="mono">13d</td><td><span class="status-dot green"></span>Sim</td><td>Facebook Ads</td><td>SP</td><td>Confirmado</td></tr>
+          <tr><td class="mono">16</td><td class="campaign-name">MAURICIO Dalmaso Lemos</td><td class="mono">29/03</td><td class="mono">22:07</td><td><span class="tier-badge tier-b">B</span></td><td class="mono">63d</td><td><span class="status-dot red"></span>Não</td><td>Facebook Ads</td><td>—</td><td>—</td></tr>
+          <tr><td class="mono">17</td><td class="campaign-name">Alexandre Costa da Cruz</td><td class="mono">30/03</td><td class="mono">08:04</td><td><span class="tier-badge tier-c">C</span></td><td class="mono">12d</td><td><span class="status-dot green"></span>Sim</td><td>Facebook Ads</td><td>PA</td><td>—</td></tr>
+          <tr><td class="mono">18</td><td class="campaign-name">Caio Mateus de Carvalho Santos</td><td class="mono">30/03</td><td class="mono">08:22</td><td><span class="tier-badge tier-b">B</span></td><td class="mono">1d</td><td><span class="status-dot red"></span>Não</td><td>Instagram</td><td>—</td><td>Confirmado</td></tr>
+          <tr><td class="mono">19</td><td class="campaign-name">João Pedro Marques de Oliveira</td><td class="mono">30/03</td><td class="mono">08:24</td><td><span class="tier-badge tier-b">B</span></td><td class="mono">21d</td><td><span class="status-dot red"></span>Não</td><td>Instagram</td><td>—</td><td>Confirmado</td></tr>
+          <tr><td class="mono">20</td><td class="campaign-name">Domingos viana Viana</td><td class="mono">30/03</td><td class="mono">12:19</td><td><span class="tier-badge tier-a">A</span></td><td class="mono">13d</td><td><span class="status-dot red"></span>Não</td><td>ManyChat</td><td>MG</td><td>—</td></tr>
+          <tr><td class="mono">21</td><td class="campaign-name">João Pedro Araújo Silva</td><td class="mono">30/03</td><td class="mono">14:14</td><td><span class="tier-badge tier-a">A</span></td><td class="mono">14d</td><td><span class="status-dot green"></span>Sim</td><td>Facebook Ads</td><td>CE</td><td>—</td></tr>
+          <tr><td class="mono">22</td><td class="campaign-name">kevin CODONHO</td><td class="mono">30/03</td><td class="mono">16:11</td><td><span class="tier-badge tier-none">—</span></td><td class="mono">7d</td><td><span class="status-dot red"></span>Não</td><td>—</td><td>—</td><td>Confirmado</td></tr>
+          <tr><td class="mono">23</td><td class="campaign-name">Jezer</td><td class="mono">30/03</td><td class="mono">17:09</td><td><span class="tier-badge tier-none">—</span></td><td class="mono">0d</td><td><span class="status-dot red"></span>Não</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td class="mono">24</td><td class="campaign-name">Wendel</td><td class="mono">30/03</td><td class="mono">17:59</td><td><span class="tier-badge tier-none">—</span></td><td class="mono">28d</td><td><span class="status-dot red"></span>Não</td><td>Facebook Ads</td><td>—</td><td>—</td></tr>
+          <tr><td class="mono">25</td><td class="campaign-name">Maicon André do Amaral Santos</td><td class="mono">30/03</td><td class="mono">18:31</td><td><span class="tier-badge tier-c">C</span></td><td class="mono">4d</td><td><span class="status-dot green"></span>Sim</td><td>YouTube</td><td>—</td><td>Confirmado</td></tr>
+          <tr><td class="mono">26</td><td class="campaign-name">Paulo Roberto De Jesus Oliveira</td><td class="mono">30/03</td><td class="mono">19:30</td><td><span class="tier-badge tier-none">—</span></td><td class="mono">0d</td><td><span class="status-dot red"></span>Não</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td class="mono">27</td><td class="campaign-name">Rafael</td><td class="mono">30/03</td><td class="mono">20:29</td><td><span class="tier-badge tier-none">—</span></td><td class="mono">0d</td><td><span class="status-dot red"></span>Não</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td class="mono">28</td><td class="campaign-name">Willian Cesar</td><td class="mono">30/03</td><td class="mono">20:55</td><td><span class="tier-badge tier-none">—</span></td><td class="mono">11d</td><td><span class="status-dot red"></span>Não</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td class="mono">29</td><td class="campaign-name">Douglas Michel Soares da Silva</td><td class="mono">30/03</td><td class="mono">22:07</td><td><span class="tier-badge tier-none">—</span></td><td class="mono">0d</td><td><span class="status-dot red"></span>Não</td><td>—</td><td>—</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ===== Timeline & Cruzamento Temporal ===== -->
+    <div class="section-title">Timeline & Distribuição Temporal</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px;">
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+        <div style="font-weight:600;margin-bottom:4px;font-size:14px;">Compras por Dia</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Vendas abertas em 29/03 às ~19h</div>
+        <div style="height:240px"><canvas id="purchaseDayChart"></canvas></div>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+        <div style="font-weight:600;margin-bottom:4px;font-size:14px;">Distribuição Horária</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Todos os 29 compradores agrupados por hora</div>
+        <div style="height:240px"><canvas id="hourlyChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ===== Cruzamento: Source × Tier ===== -->
+    <div class="section-title">Cruzamento: Canal de Captação × Qualidade (Tier)</div>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:28px;">
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+        <div style="font-weight:600;margin-bottom:4px;font-size:14px;">Tier por Canal — qual fonte gera compradores mais qualificados?</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Stacked por Tier A / B / C / Sem dados</div>
+        <div style="height:260px"><canvas id="sourceTierChart"></canvas></div>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+        <div style="font-weight:600;margin-bottom:4px;font-size:14px;">Fontes de Captação</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">% de compradores por origem</div>
+        <div style="height:260px"><canvas id="buyerSourceChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ===== Cruzamento: Jornada até a compra ===== -->
+    <div class="section-title">Cruzamento: Jornada até a Compra (dias entre cadastro e compra)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px;">
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+        <div style="font-weight:600;margin-bottom:4px;font-size:14px;">Tempo de Decisão</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Quantos dias cada comprador levou do cadastro à compra</div>
+        <div style="height:300px"><canvas id="journeyChart"></canvas></div>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column;gap:12px;justify-content:center;">
+        <div style="font-weight:600;font-size:14px;margin-bottom:4px;">Insights da Jornada</div>
+        <div style="background:var(--green-50);border-left:3px solid var(--green-500);padding:12px;border-radius:var(--radius-xs);">
+          <div style="font-size:12px;font-weight:700;color:var(--green-600);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Decisão Rápida (0–5 dias)</div>
+          <div style="font-size:13px;color:var(--text-secondary);">4 compradores. Maicon (4d), Caio (1d), Eric (0d), Jezer (0d) — cadastraram e já compraram. Recomendação: mensagem de boas-vindas com oferta imediata para leads novos.</div>
+        </div>
+        <div style="background:var(--blue-50);border-left:3px solid var(--blue-500);padding:12px;border-radius:var(--radius-xs);">
+          <div style="font-size:12px;font-weight:700;color:var(--blue-600);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Decisão Média (6–14 dias)</div>
+          <div style="font-size:13px;color:var(--text-secondary);">11 compradores — o grupo dominante. Leads que acompanharam o evento inteiro antes de decidir. Precisam de nutrição durante a semana do lançamento.</div>
+        </div>
+        <div style="background:var(--amber-50);border-left:3px solid var(--amber-500);padding:12px;border-radius:var(--radius-xs);">
+          <div style="font-size:12px;font-weight:700;color:var(--amber-600);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Leads Antigos (15+ dias)</div>
+          <div style="font-size:13px;color:var(--text-secondary);">8 compradores — MAURICIO (63d!), Maria Geovana (23d), João Paulo (21d). Leads que ficaram dormentes e foram reativados pela campanha. Vale criar segmento de reaquecimento.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Cruzamento: Confirmação × Compra + Pesquisa × Tier ===== -->
+    <div class="section-title">Cruzamentos: Confirmação de Optin e Pesquisa vs Tier</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:28px;">
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+        <div style="font-weight:600;margin-bottom:4px;font-size:14px;">Status de Confirmação</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Confirmados vs não confirmados no optin LI26</div>
+        <div style="height:220px"><canvas id="statusConfChart"></canvas></div>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+        <div style="font-weight:600;margin-bottom:4px;font-size:14px;">Pesquisa Respondida × Tier</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Respondentes vs não-respondentes por Tier</div>
+        <div style="height:220px"><canvas id="pesqTierChart"></canvas></div>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column;gap:10px;justify-content:center;">
+        <div style="font-weight:600;font-size:14px;margin-bottom:2px;">O que dizem os dados</div>
+        <div style="background:var(--purple-50);border-left:3px solid var(--purple-500);padding:10px;border-radius:var(--radius-xs);font-size:12px;color:var(--text-secondary);">
+          <strong style="color:var(--purple-600);">Confirmados compram na mesma taxa</strong> que não confirmados. 9 confirmados vs 11 não confirmados entre compradores — confirmar optin não foi determinante para a compra.
+        </div>
+        <div style="background:var(--green-50);border-left:3px solid var(--green-500);padding:10px;border-radius:var(--radius-xs);font-size:12px;color:var(--text-secondary);">
+          <strong style="color:var(--green-600);">Respondentes da pesquisa concentram Tier A/B:</strong> dos 11 que responderam, 6 são Tier A ou B. Isso valida a pesquisa como proxy de qualidade — leads que se engajam com pesquisa são mais qualificados.
+        </div>
+        <div style="background:var(--amber-50);border-left:3px solid var(--amber-500);padding:10px;border-radius:var(--radius-xs);font-size:12px;color:var(--text-secondary);">
+          <strong style="color:var(--amber-600);">62% dos compradores SEM pesquisa:</strong> 18 compradores não responderam. Compraram por decisão própria, não por engajamento com conteúdo. São leads que respondem melhor a oferta direta e urgência.
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Pesquisa de Audiência — 11 respondentes ===== -->
+    <div class="section-title">Pesquisa de Audiência [LI26][PESQ] — 11 Compradores Respondentes</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+        <div style="font-weight:600;margin-bottom:4px;font-size:14px;">Perfil — O que você é?</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Segmento de programação do comprador</div>
+        <div style="height:230px"><canvas id="oQueEChart"></canvas></div>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+        <div style="font-weight:600;margin-bottom:4px;font-size:14px;">Experiência Prévia com Programação</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Nível de conhecimento pré-compra</div>
+        <div style="height:230px"><canvas id="jaEstudouChart"></canvas></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+        <div style="font-weight:600;margin-bottom:4px;font-size:14px;">Renda Mensal Individual</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Poder aquisitivo dos compradores</div>
+        <div style="height:230px"><canvas id="rendaChart"></canvas></div>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+        <div style="font-weight:600;margin-bottom:4px;font-size:14px;">Escolaridade</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Nível de formação acadêmica</div>
+        <div style="height:230px"><canvas id="escolaridadeChart"></canvas></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:28px;">
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+        <div style="font-weight:600;margin-bottom:4px;font-size:14px;">Cartão de Crédito</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Acesso a crédito declarado</div>
+        <div style="height:200px"><canvas id="cartaoChart"></canvas></div>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+        <div style="font-weight:600;margin-bottom:4px;font-size:14px;">Já Comprou Curso Online?</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Histórico de consumo de conteúdo pago</div>
+        <div style="height:200px"><canvas id="cursoOnlineChart"></canvas></div>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column;gap:10px;justify-content:center;">
+        <div style="font-weight:600;font-size:14px;margin-bottom:2px;">Perfil Financeiro</div>
+        <div style="background:var(--blue-50);border-left:3px solid var(--blue-500);padding:10px;border-radius:var(--radius-xs);font-size:12px;color:var(--text-secondary);">
+          <strong style="color:var(--blue-600);">55% têm cartão de crédito</strong> (6 de 11). Considerando que alguns não responderam essa questão, o parcelamento pode ser fator de viabilidade para mais da metade.
+        </div>
+        <div style="background:var(--green-50);border-left:3px solid var(--green-500);padding:10px;border-radius:var(--radius-xs);font-size:12px;color:var(--text-secondary);">
+          <strong style="color:var(--green-600);">45% já compraram curso</strong> (5 de 11). Compradores recorrentes de cursos online — validando que o produto tem fit com quem já investe em educação digital.
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Cruzamento: Renda × Source ===== -->
+    <div class="section-title">Cruzamento: Renda × Source (entre respondentes da pesquisa)</div>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:28px;">
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+        <div style="font-weight:600;margin-bottom:4px;font-size:14px;">Faixa de Renda por Canal de Captação</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Comparação entre os canais que trazem compradores com maior renda</div>
+        <div style="height:260px"><canvas id="rendaSourceChart"></canvas></div>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column;gap:10px;justify-content:center;">
+        <div style="font-weight:600;font-size:14px;margin-bottom:2px;">O que revela este cruzamento</div>
+        <div style="background:var(--purple-50);border-left:3px solid var(--purple-500);padding:10px;border-radius:var(--radius-xs);font-size:12px;color:var(--text-secondary);">
+          <strong style="color:var(--purple-600);">Facebook Ads traz o espectro mais amplo:</strong> de compradores sem renda até R$10k+. Isso valida a estratégia de audiência ampla com múltiplos criativos por faixa.
+        </div>
+        <div style="background:var(--green-50);border-left:3px solid var(--green-500);padding:10px;border-radius:var(--radius-xs);font-size:12px;color:var(--text-secondary);">
+          <strong style="color:var(--green-600);">YouTube atrai compradores de renda mais baixa:</strong> todos os respondentes de YouTube estão em faixas até R$1.500. Conteúdo orgânico alcança público de menor poder aquisitivo — mas que compra.
+        </div>
+        <div style="background:var(--amber-50);border-left:3px solid var(--amber-500);padding:10px;border-radius:var(--radius-xs);font-size:12px;color:var(--text-secondary);">
+          <strong style="color:var(--amber-600);">Renda não impede compra:</strong> 3 compradores declararam "sem renda" e compraram mesmo assim. Parcelamento acessível é fator crítico de conversão.
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Tabela Detalhada da Pesquisa ===== -->
+    <div class="section-title">Detalhes da Pesquisa por Comprador</div>
+    <div class="data-table-wrapper" style="margin-bottom:16px;">
+      <table class="data-table" id="pesquisaTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable('pesquisaTable',0)" style="cursor:pointer">Nome</th>
+            <th onclick="sortTable('pesquisaTable',1)" style="cursor:pointer">Tier</th>
+            <th onclick="sortTable('pesquisaTable',2)" style="cursor:pointer">Perfil</th>
+            <th onclick="sortTable('pesquisaTable',3)" style="cursor:pointer">Profissão</th>
+            <th onclick="sortTable('pesquisaTable',4)" style="cursor:pointer">Renda</th>
+            <th onclick="sortTable('pesquisaTable',5)" style="cursor:pointer">Estado</th>
+            <th onclick="sortTable('pesquisaTable',6)" style="cursor:pointer">Escolaridade</th>
+            <th onclick="sortTable('pesquisaTable',7)" style="cursor:pointer">Cartão</th>
+            <th onclick="sortTable('pesquisaTable',8)" style="cursor:pointer">Tempo conhece DnD</th>
+            <th onclick="sortTable('pesquisaTable',9)" style="cursor:pointer">Principal impedimento</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="campaign-name">Ana lopes</td><td><span class="tier-badge tier-c">C</span></td><td>Iniciante</td><td>Admin</td><td>Até R$1.5k</td><td>Outro país</td><td>Superior completo</td><td>Não</td><td>Novo (anúncio)</td><td>Tempo</td></tr>
+          <tr><td class="campaign-name">Alexandre Costa da Cruz</td><td><span class="tier-badge tier-c">C</span></td><td>Iniciante</td><td>Suporte técnico N2</td><td>Até R$1.5k</td><td>PA</td><td>Superior incompleto</td><td>Sim</td><td>Novo (anúncio)</td><td>Renda / mercado</td></tr>
+          <tr><td class="campaign-name">Gabriel Santos</td><td><span class="tier-badge tier-c">C</span></td><td>Estudante</td><td>Vendedor</td><td>Sem renda</td><td>RJ</td><td>Médio completo</td><td>Não</td><td>~6 meses</td><td>Dúvida na sintaxe</td></tr>
+          <tr><td class="campaign-name">Ismael</td><td><span class="tier-badge tier-b">B</span></td><td>Migração de área</td><td>Proprietário empresa</td><td>R$5k–10k</td><td>SC</td><td>Superior incompleto</td><td>Sim</td><td>~6 meses</td><td>Falta de direção</td></tr>
+          <tr><td class="campaign-name">João Paulo</td><td><span class="tier-badge tier-c">C</span></td><td>Curioso</td><td>Vendedor / estoquista</td><td>Até R$1.5k</td><td>PA</td><td>Médio completo</td><td>Não</td><td>~6 meses</td><td>Investir em curso</td></tr>
+          <tr><td class="campaign-name">João Pedro Araújo Silva</td><td><span class="tier-badge tier-a">A</span></td><td>Estudante</td><td>Estudante (18a)</td><td>Sem renda</td><td>CE</td><td>Médio completo</td><td>Não</td><td>1–3 meses</td><td>Falta de cursos bons</td></tr>
+          <tr><td class="campaign-name">Maicon André do Amaral Santos</td><td><span class="tier-badge tier-c">C</span></td><td>Iniciante</td><td>Auxiliar de produção</td><td>R$1.5k–2.5k</td><td>—</td><td>Superior completo</td><td>Sim</td><td>Novo (anúncio)</td><td>Tempo e foco</td></tr>
+          <tr><td class="campaign-name">Maria Geovana Gonçalo de Oliveira</td><td><span class="tier-badge tier-c">C</span></td><td>Iniciante</td><td>Sem profissão</td><td>Sem renda</td><td>PB</td><td>Superior incompleto</td><td>Sim</td><td>1–3 meses</td><td>Precisa de aulas claras</td></tr>
+          <tr><td class="campaign-name">Miguel Maturana Neto</td><td><span class="tier-badge tier-a">A</span></td><td>Migração de área</td><td>Analista de laboratório</td><td>R$1.5k–2.5k</td><td>SP</td><td>Superior completo</td><td>Sim</td><td>1–3 meses</td><td>Não sabe programar</td></tr>
+          <tr><td class="campaign-name">Yan</td><td><span class="tier-badge tier-c">C</span></td><td>Migração de área</td><td>Eng. ambiental</td><td>R$5k–10k</td><td>SP</td><td>Superior completo</td><td>Sim</td><td>1–3 meses</td><td>Exercícios guiados</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// Register datalabels plugin
+Chart.register(ChartDataLabels);
+
+// Tab switching
+function switchTab(tabName, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tabName).classList.add('active');
+  btn.classList.add('active');
+}
+
+// Sub-tab switching
+function switchSub(name, btn) {
+  document.querySelectorAll('.sub-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sub-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('sub-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// Table filtering
+function filterTable(tableId, query) {
+  const rows = document.querySelectorAll('#' + tableId + ' tbody tr');
+  const q = query.toLowerCase().trim();
+  rows.forEach(row => {
+    const text = row.textContent.toLowerCase();
+    row.classList.toggle('hidden', q && !text.includes(q));
+  });
+}
+
+// Table sorting
+const sortState = {};
+function sortTable(tableId, colIdx) {
+  const table = document.getElementById(tableId);
+  const tbody = table.querySelector('tbody');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  const key = tableId + '-' + colIdx;
+  sortState[key] = sortState[key] === 'asc' ? 'desc' : 'asc';
+  const dir = sortState[key] === 'asc' ? 1 : -1;
+
+  rows.sort((a, b) => {
+    let aVal = a.cells[colIdx]?.textContent.trim() || '';
+    let bVal = b.cells[colIdx]?.textContent.trim() || '';
+    // Try numeric
+    const aNum = parseFloat(aVal.replace(/[^0-9.,%-]/g, '').replace(',', '.'));
+    const bNum = parseFloat(bVal.replace(/[^0-9.,%-]/g, '').replace(',', '.'));
+    if (!isNaN(aNum) && !isNaN(bNum)) return (aNum - bNum) * dir;
+    return aVal.localeCompare(bVal, 'pt-BR') * dir;
+  });
+
+  rows.forEach(r => tbody.appendChild(r));
+
+  // Update header highlight
+  table.querySelectorAll('th').forEach((th, i) => {
+    th.classList.toggle('sort-active', i === colIdx);
+  });
+}
+
+// Chart defaults
+Chart.defaults.color = '#5A6B7F';
+Chart.defaults.borderColor = '#E2E8F0';
+Chart.defaults.font.family = "'Outfit', sans-serif";
+Chart.defaults.font.size = 12;
+// Disable datalabels globally, enable per dataset
+Chart.defaults.plugins.datalabels = { display: false };
+
+const gridColor = '#EDF2F7';
+const blue600 = '#2563EB', blue400 = '#60A5FA', green500 = '#10B981', amber500 = '#F59E0B', red500 = '#EF4444', purple500 = '#8B5CF6', teal500 = '#14B8A6';
+
+// DAILY LEADS (bar stacked)
+const dailyData = [
+  {d:'03/03',paid:13,org:15},{d:'04/03',paid:54,org:5},{d:'05/03',paid:266,org:12},
+  {d:'06/03',paid:104,org:9},{d:'07/03',paid:170,org:8},{d:'08/03',paid:183,org:21},
+  {d:'09/03',paid:279,org:13},{d:'10/03',paid:252,org:54},{d:'11/03',paid:222,org:21},
+  {d:'12/03',paid:217,org:20},{d:'13/03',paid:193,org:18},{d:'14/03',paid:160,org:9},
+  {d:'15/03',paid:222,org:7},{d:'16/03',paid:114,org:42},{d:'17/03',paid:179,org:49},
+  {d:'18/03',paid:311,org:40},{d:'19/03',paid:313,org:16},{d:'20/03',paid:369,org:59},
+  {d:'21/03',paid:397,org:48},{d:'22/03',paid:463,org:55},{d:'23/03',paid:345,org:45},
+  {d:'24/03',paid:56,org:9},{d:'25/03',paid:17,org:4}
+];
+
+new Chart(document.getElementById('dailyLeadsChart'), {
+  type: 'bar',
+  data: {
+    labels: dailyData.map(d => d.d),
+    datasets: [
+      { label: 'Tráfego Pago', data: dailyData.map(d => d.paid), backgroundColor: blue600 + 'CC', borderRadius: 4, borderSkipped: false },
+      { label: 'Orgânico', data: dailyData.map(d => d.org), backgroundColor: green500 + 'CC', borderRadius: 4, borderSkipped: false }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, grid: { color: gridColor } } },
+    plugins: { legend: { position: 'top', labels: { usePointStyle: true, pointStyle: 'rectRounded', padding: 16 } }, datalabels: { display: false } }
+  }
+});
+
+// SOURCE PIE
+new Chart(document.getElementById('sourcePieChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Facebook Ads', 'Instagram', 'YouTube', 'ManyChat', 'ActiveCampaign', 'Discord', 'Outros'],
+    datasets: [{ data: [4802, 170, 127, 81, 70, 26, 203], backgroundColor: [blue600, purple500, red500, amber500, teal500, blue400, '#94A3B8'], borderWidth: 2, borderColor: '#fff', hoverOffset: 8 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'right', labels: { usePointStyle: true, padding: 12, font: { size: 11 } } }, datalabels: { display: false } } }
+});
+
+// CHECKIN
+const checkinData = [{d:'20/03',v:112},{d:'21/03',v:128},{d:'22/03',v:131},{d:'23/03',v:155},{d:'24/03',v:65},{d:'25/03',v:60}];
+new Chart(document.getElementById('checkinChart'), {
+  type: 'bar',
+  data: { labels: checkinData.map(d => d.d), datasets: [{ label: 'Check-ins', data: checkinData.map(d => d.v), backgroundColor: green500 + 'AA', borderColor: green500, borderWidth: 1, borderRadius: 6 }] },
+  options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false } }, y: { grid: { color: gridColor } } }, plugins: { legend: { display: false }, datalabels: { display: false } } }
+});
+
+// DAILY LEADS LINE CHART (Captação tab)
+const dailyTotals = dailyData.map(d => ({ d: d.d, total: d.paid + d.org }));
+new Chart(document.getElementById('dailyLeadsLineChart'), {
+  type: 'line',
+  data: {
+    labels: dailyTotals.map(d => d.d),
+    datasets: [{
+      label: 'Total Leads/Dia',
+      data: dailyTotals.map(d => d.total),
+      borderColor: blue600, backgroundColor: blue600 + '15',
+      borderWidth: 3, pointRadius: 5, pointBackgroundColor: blue600,
+      fill: true, tension: 0.3,
+      datalabels: { display: true, align: 'top', color: blue600, font: { weight: 'bold', size: 11 }, formatter: v => v }
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: { x: { grid: { display: false } }, y: { grid: { color: gridColor }, beginAtZero: true } },
+    plugins: { legend: { display: false } }
+  }
+});
+
+// EMAIL/DAY CHART with data labels
+const emailDayData = [
+  {d:'19/03', sends:6345, opens:839, clicks:14},
+  {d:'20/03', sends:6934, opens:913, clicks:33},
+  {d:'21/03', sends:11669, opens:1501, clicks:79},
+  {d:'22/03', sends:8663, opens:1154, clicks:79},
+  {d:'23/03', sends:9681, opens:1006, clicks:79},
+  {d:'25/03', sends:15035, opens:2366, clicks:322},
+  {d:'26/03', sends:21190, opens:4043, clicks:262}
+];
+
+new Chart(document.getElementById('emailDayChart'), {
+  type: 'bar',
+  data: {
+    labels: emailDayData.map(d => d.d),
+    datasets: [
+      {
+        label: 'Envios',
+        data: emailDayData.map(d => d.sends),
+        backgroundColor: blue600 + '33', borderColor: blue600, borderWidth: 1.5,
+        borderRadius: 4, order: 3, yAxisID: 'y',
+        datalabels: { display: true, anchor: 'end', align: 'top', color: blue600, font: { size: 10, weight: '600' }, formatter: v => (v/1000).toFixed(1)+'K' }
+      },
+      {
+        label: 'Open Rate %',
+        data: emailDayData.map(d => +(d.opens / d.sends * 100).toFixed(1)),
+        type: 'line', borderColor: green500, backgroundColor: green500 + '22',
+        borderWidth: 2.5, pointRadius: 6, pointBackgroundColor: green500,
+        tension: 0.3, fill: false, order: 1, yAxisID: 'y1',
+        datalabels: { display: true, align: 'top', offset: 8, color: green500, font: { size: 11, weight: '700' }, formatter: v => v + '%',
+          backgroundColor: 'rgba(255,255,255,0.85)', borderRadius: 4, padding: {top:2,bottom:2,left:4,right:4} }
+      },
+      {
+        label: 'Click Rate %',
+        data: emailDayData.map(d => +(d.clicks / d.sends * 100).toFixed(2)),
+        type: 'line', borderColor: amber500, backgroundColor: amber500 + '22',
+        borderWidth: 2.5, pointRadius: 6, pointBackgroundColor: amber500,
+        tension: 0.3, fill: false, order: 2, yAxisID: 'y1',
+        datalabels: { display: true, align: 'bottom', offset: 8, color: amber500, font: { size: 11, weight: '700' }, formatter: v => v + '%',
+          backgroundColor: 'rgba(255,255,255,0.85)', borderRadius: 4, padding: {top:2,bottom:2,left:4,right:4} }
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { grid: { display: false } },
+      y: { type: 'linear', position: 'left', grid: { color: gridColor }, title: { display: true, text: 'Envios', color: '#94A3B8' } },
+      y1: { type: 'linear', position: 'right', grid: { display: false }, title: { display: true, text: 'Taxa %', color: '#94A3B8' }, ticks: { callback: v => v + '%' }, min: 0, max: 25 }
+    },
+    plugins: { legend: { position: 'top', labels: { usePointStyle: true, padding: 16 } } }
+  }
+});
+
+// OPEN RATE
+const allEmails = [
+  {n:'[CAD-01] Boas-vindas',or:24.20,t:'CAD'},{n:'[ENG-01] Conheça história',or:22.60,t:'ENG'},{n:'[ENG-02] Comunidade Discord',or:21.70,t:'ENG'},
+  {n:'[CAD-02] Confirmar inscrição',or:20.20,t:'CAD'},{n:'[CAD-03] Agora é a hora',or:15.60,t:'CAD'},{n:'[22] HOJE Começou ZP',or:15.05,t:'CAMP'},
+  {n:'[24] Pegue Ticket',or:14.39,t:'CAMP'},{n:'[26] IMPORTANTE amanhã',or:14.31,t:'CAMP'},{n:'[20] Combo perfeito',or:14.19,t:'CAMP'},
+  {n:'[27] Ingresso esperando',or:12.34,t:'CAMP'},{n:'[26] Participe sorteio',or:12.33,t:'CAMP'},{n:'[21] A TRÍADE',or:12.27,t:'CAMP'},
+  {n:'[CAD-04] Só abrir aqui',or:12.50,t:'CAD'},{n:'[25] Garanta certificado',or:11.91,t:'CAMP'},{n:'[36] Veja o que rolou',or:11.52,t:'CAMP'},
+  {n:'[23] AO VIVO',or:11.35,t:'CAMP'},{n:'[37] AULAS SAIR AR',or:10.81,t:'CAMP'},{n:'[34] Aula 1 no ar',or:10.41,t:'CAMP'},{n:'[35] Se eles conseg',or:10.37,t:'CAMP'}
+];
+
+new Chart(document.getElementById('openRateChart'), {
+  type: 'bar',
+  data: {
+    labels: allEmails.map(c => c.n),
+    datasets: [{ label: 'Open Rate %', data: allEmails.map(c => c.or),
+      backgroundColor: allEmails.map(c => c.t === 'ENG' ? green500 + 'CC' : c.t === 'CAD' ? blue400 + 'AA' : blue600 + '88'), borderRadius: 4 }]
+  },
+  options: {
+    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+    scales: { x: { grid: { color: gridColor }, max: 30, ticks: { callback: v => v + '%' } }, y: { grid: { display: false }, ticks: { font: { size: 10 } } } },
+    plugins: { legend: { display: false }, datalabels: { display: false } }
+  }
+});
+
+// CTO
+const ctoData = [
+  {n:'[CAD-01] Boas-vindas',cto:18.56},{n:'[CAD-02] Confirmar',cto:14.83},{n:'[24] Pegue Ticket',cto:13.11},
+  {n:'[27] Ingresso',cto:10.65},{n:'[37] AULAS',cto:9.52},{n:'[34] Aula 1',cto:9.13},
+  {n:'[CAD-03] Agora é hora',cto:7.01},{n:'[35] Se eles',cto:6.57},{n:'[ENG-02] Discord',cto:6.01},
+  {n:'[36] Veja rolou',cto:6.06},{n:'[23] AO VIVO',cto:5.49},{n:'[CAD-04] Só abrir',cto:5.25},
+  {n:'[26] IMPORTANTE',cto:3.55},{n:'[21] TRÍADE',cto:2.55},{n:'[22] HOJE',cto:2.15},
+  {n:'[25] Certificado',cto:1.51},{n:'[20] Combo',cto:0.89},{n:'[ENG-02] História',cto:0},{n:'[26] Sorteio',cto:0}
+];
+
+new Chart(document.getElementById('ctoChart'), {
+  type: 'bar',
+  data: {
+    labels: ctoData.map(c => c.n),
+    datasets: [{ label: 'CTO %', data: ctoData.map(c => c.cto),
+      backgroundColor: ctoData.map(c => c.cto >= 10 ? green500 + 'CC' : c.cto >= 5 ? amber500 + 'AA' : red500 + '88'), borderRadius: 4 }]
+  },
+  options: {
+    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+    scales: { x: { grid: { color: gridColor }, max: 22, ticks: { callback: v => v + '%' } }, y: { grid: { display: false }, ticks: { font: { size: 10 } } } },
+    plugins: { legend: { display: false }, datalabels: { display: false } }
+  }
+});
+
+// PLACEMENT
+new Chart(document.getElementById('placementChart'), {
+  type: 'doughnut',
+  data: { labels: ['IG Reels','IG Stories','IG Feed','FB Reels','FB Feed','FB Instream','FB Stories','Outros'],
+    datasets: [{ data: [2009,1046,736,530,238,64,43,136], backgroundColor: [blue600,blue400,purple500,red500,amber500,teal500,'#FCD34D','#94A3B8'], borderWidth: 2, borderColor: '#fff' }] },
+  options: { responsive: true, maintainAspectRatio: false, cutout: '55%', plugins: { legend: { position: 'right', labels: { usePointStyle: true, padding: 8, font: { size: 10 } } }, datalabels: { display: false } } }
+});
+
+// AUDIENCE
+const audiences = [{n:'Seguidores & Engaj 15D',v:1641},{n:'Interesses Ultra Segm.',v:1015},{n:'LAL 1% Engajados',v:535},{n:'Envolvimento 90D',v:417},{n:'Envolvimento 365D',v:333},{n:'Mix Geral',v:240},{n:'Lista Completa',v:130},{n:'Leads Engajados',v:108},{n:'Outros',v:383}];
+new Chart(document.getElementById('audienceChart'), {
+  type: 'bar',
+  data: { labels: audiences.map(a => a.n), datasets: [{ data: audiences.map(a => a.v), backgroundColor: blue600 + '99', hoverBackgroundColor: blue600, borderRadius: 4 }] },
+  options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { grid: { color: gridColor } }, y: { grid: { display: false }, ticks: { font: { size: 10 } } } }, plugins: { legend: { display: false }, datalabels: { display: false } } }
+});
+
+// CHECKIN SOURCE
+new Chart(document.getElementById('checkinSourceChart'), {
+  type: 'doughnut',
+  data: { labels: ['Facebook Ads','ManyChat','Sem UTM','Instagram','YouTube','ActiveCampaign','Discord'],
+    datasets: [{ data: [436,80,51,36,30,11,6], backgroundColor: [blue600,amber500,'#94A3B8',purple500,red500,teal500,blue400], borderWidth: 2, borderColor: '#fff' }] },
+  options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right', labels: { usePointStyle: true, padding: 8, font: { size: 11 } } }, datalabels: { display: false } } }
+});
+
+// CONVERSION RATE
+const convRates = [{source:'ManyChat',rate:98.8},{source:'YouTube',rate:23.6},{source:'Discord',rate:23.1},{source:'Instagram',rate:21.2},{source:'ActiveCampaign',rate:15.7},{source:'Facebook Ads',rate:9.1}];
+new Chart(document.getElementById('conversionRateChart'), {
+  type: 'bar',
+  data: { labels: convRates.map(c => c.source), datasets: [{ label: 'Check-in %', data: convRates.map(c => c.rate),
+    backgroundColor: convRates.map(c => c.rate > 20 ? green500 + 'CC' : c.rate > 10 ? amber500 + 'AA' : red500 + '88'), borderRadius: 6 }] },
+  options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false } }, y: { grid: { color: gridColor }, ticks: { callback: v => v + '%' } } }, plugins: { legend: { display: false }, datalabels: { display: false } } }
+});
+
+// SOURCE BARS
+const sources = [
+  {name:'Facebook Ads',value:4802,pct:'87.6%',color:blue600},{name:'Instagram',value:170,pct:'3.1%',color:purple500},
+  {name:'YouTube',value:127,pct:'2.3%',color:red500},{name:'ManyChat',value:81,pct:'1.5%',color:amber500},
+  {name:'ActiveCampaign',value:70,pct:'1.3%',color:teal500},{name:'Discord',value:26,pct:'0.5%',color:blue400},
+  {name:'LinkedIn',value:9,pct:'0.2%',color:'#64748B'},{name:'TikTok',value:6,pct:'0.1%',color:'#EC4899'},
+  {name:'Spotify',value:2,pct:'0.04%',color:green500},{name:'WhatsApp',value:1,pct:'0.02%',color:'#94A3B8'},
+  {name:'Sem UTM',value:185,pct:'3.4%',color:'#94A3B8'}
+];
+const barList = document.getElementById('sourceBarList');
+sources.forEach(s => {
+  const w = Math.max((s.value / 4802) * 100, 2.5);
+  barList.innerHTML += `<div class="source-bar-item"><div class="source-bar-label">${s.name}</div><div class="source-bar-track"><div class="source-bar-fill" style="width:${w}%;background:${s.color}"><span class="source-bar-value">${s.value.toLocaleString('pt-BR')}</span></div></div><div class="source-bar-pct">${s.pct}</div></div>`;
+});
+
+// =================== COMPRADORES CHARTS ===================
+
+const g500 = '#10B981', b600 = '#2563EB', b400 = '#60A5FA', a500 = '#F59E0B',
+      r500 = '#EF4444', p500 = '#8B5CF6', t500 = '#14B8A6', gc = '#EDF2F7';
+
+// ── Compras por Dia ─────────────────────────────────────────────
+new Chart(document.getElementById('purchaseDayChart'), {
+  type: 'bar',
+  data: {
+    labels: ['29/03/2026
+(Dia 1)', '30/03/2026
+(Dia 2)'],
+    datasets: [{
+      data: [16, 13],
+      backgroundColor: [g500 + 'CC', b600 + 'CC'],
+      borderRadius: 10, borderSkipped: false, barThickness: 70,
+      datalabels: { display: true, anchor: 'end', align: 'top', color: '#1A2332',
+        font: { weight: '800', size: 22 }, formatter: v => v }
+    }]
+  },
+  options: { responsive: true, maintainAspectRatio: false,
+    scales: { x: { grid: { display: false } }, y: { grid: { color: gc }, beginAtZero: true, max: 20 } },
+    plugins: { legend: { display: false } } }
+});
+
+// ── Distribuição Horária ─────────────────────────────────────────
+new Chart(document.getElementById('hourlyChart'), {
+  type: 'bar',
+  data: {
+    labels: ['08h','12h','14h','16h','17h','18h','19h','20h','21h','22h'],
+    datasets: [
+      { label: 'Dia 1 (29/03)', data: [0, 0, 0, 0, 0, 0, 1, 9, 4, 2],
+        backgroundColor: g500 + 'BB', borderRadius: 4 },
+      { label: 'Dia 2 (30/03)', data: [3, 1, 1, 1, 2, 1, 1, 2, 0, 1],
+        backgroundColor: b600 + 'BB', borderRadius: 4 }
+    ]
+  },
+  options: { responsive: true, maintainAspectRatio: false,
+    scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, grid: { color: gc } } },
+    plugins: { legend: { position: 'top', labels: { usePointStyle: true, padding: 14 } },
+      datalabels: { display: false } } }
+});
+
+// ── Source × Tier (stacked bar) ──────────────────────────────────
+new Chart(document.getElementById('sourceTierChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Facebook Ads', 'YouTube', 'Instagram', 'ManyChat', 'ActiveCampaign'],
+    datasets: [
+      { label: 'Tier A', data: [2, 0, 1, 1, 0],
+        backgroundColor: g500 + 'CC', borderRadius: 0 },
+      { label: 'Tier B', data: [3, 0, 1, 0, 0],
+        backgroundColor: b400 + 'CC', borderRadius: 0 },
+      { label: 'Tier C', data: [5, 4, 1, 0, 1],
+        backgroundColor: a500 + 'CC', borderRadius: 0 },
+      { label: 'Sem Tier', data: [1, 0, 1, 0, 0],
+        backgroundColor: '#CBD5E1', borderRadius: [0,0,4,4] }
+    ]
+  },
+  options: { responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { stacked: true, grid: { display: false } },
+      y: { stacked: true, grid: { color: gc }, ticks: { stepSize: 1 } }
+    },
+    plugins: { legend: { position: 'top', labels: { usePointStyle: true, padding: 14, font: { size: 11 } } },
+      datalabels: { display: false } } }
+});
+
+// ── Source Donut ──────────────────────────────────────────────────
+new Chart(document.getElementById('buyerSourceChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Facebook Ads', 'YouTube', 'Instagram', 'ManyChat', 'ActiveCampaign', 'Sem UTM'],
+    datasets: [{ data: [11, 4, 3, 1, 1, 9],
+      backgroundColor: [b600, r500, p500, a500, t500, '#CBD5E1'],
+      borderWidth: 3, borderColor: '#fff', hoverOffset: 8 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, cutout: '62%',
+    plugins: {
+      legend: { position: 'right', labels: { usePointStyle: true, padding: 12, font: { size: 11 } } },
+      datalabels: { display: true, color: '#fff', font: { weight: '700', size: 12 },
+        formatter: (v, ctx) => v > 0 ? v : '' } } }
+});
+
+// ── Jornada até compra (horizontal bar, todos) ────────────────────
+const journeyBuyers = [
+  ['Caio Mateus', 1], ['Maicon André', 4], ['Ana lopes', 5], ['Diego Queiroz', 6],
+  ['Marcos', 6], ['Gabriel Santos', 7], ['kevin CODONHO', 7], ['Ismael', 8],
+  ['Anderson Luiz', 10], ['DANIEL Feitosa', 11], ['Alexandre Costa', 12],
+  ['Miguel Maturana', 13], ['Yan', 13], ['Domingos Viana', 13],
+  ['João Pedro Araújo', 14], ['Leonardo', 19], ['João Paulo', 21],
+  ['João P. Marques', 21], ['David miranda', 21], ['KAUA TODA', 24],
+  ['Wendel', 28], ['MAURICIO Lemos', 63]
+];
+new Chart(document.getElementById('journeyChart'), {
+  type: 'bar',
+  data: {
+    labels: journeyBuyers.map(b => b[0]),
+    datasets: [{
+      label: 'Dias até comprar',
+      data: journeyBuyers.map(b => b[1]),
+      backgroundColor: journeyBuyers.map(b =>
+        b[1] <= 5 ? g500 + 'CC' : b[1] <= 14 ? b600 + 'CC' : a500 + 'CC'),
+      borderRadius: 4,
+      datalabels: { display: true, anchor: 'end', align: 'right', color: '#5A6B7F',
+        font: { size: 10, weight: '600' }, formatter: v => v + 'd' }
+    }]
+  },
+  options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { grid: { color: gc }, max: 70,
+        ticks: { callback: v => v + 'd' } },
+      y: { grid: { display: false }, ticks: { font: { size: 10 } } }
+    },
+    plugins: { legend: { display: false } } }
+});
+
+// ── Status Confirmação ────────────────────────────────────────────
+new Chart(document.getElementById('statusConfChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Confirmado', 'Não confirmado', 'Sem dados'],
+    datasets: [{ data: [9, 11, 9],
+      backgroundColor: [g500, a500, '#CBD5E1'],
+      borderWidth: 3, borderColor: '#fff', hoverOffset: 8 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, cutout: '60%',
+    plugins: {
+      legend: { position: 'bottom', labels: { usePointStyle: true, padding: 12, font: { size: 11 } } },
+      datalabels: { display: true, color: '#fff', font: { weight: '700', size: 13 },
+        formatter: v => v > 0 ? v : '' } } }
+});
+
+// ── Pesquisa × Tier (grouped bar) ────────────────────────────────
+new Chart(document.getElementById('pesqTierChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Tier A', 'Tier B', 'Tier C', 'Sem Tier'],
+    datasets: [
+      { label: 'Respondeu pesquisa', data: [2, 2, 5, 2],
+        backgroundColor: g500 + 'CC', borderRadius: 4 },
+      { label: 'Não respondeu',      data: [2, 3, 6, 7],
+        backgroundColor: '#CBD5E1', borderRadius: 4 }
+    ]
+  },
+  options: { responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { grid: { display: false } },
+      y: { grid: { color: gc }, beginAtZero: true, ticks: { stepSize: 1 } }
+    },
+    plugins: { legend: { position: 'top', labels: { usePointStyle: true, padding: 12 } },
+      datalabels: { display: false } } }
+});
+
+// ── O que você é? ─────────────────────────────────────────────────
+new Chart(document.getElementById('oQueEChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Programador iniciante', 'Migrar para programação', 'Estudante de prog.', 'Curioso sobre prog.'],
+    datasets: [{
+      data: [4, 3, 2, 2],
+      backgroundColor: [b600 + 'CC', p500 + 'CC', g500 + 'CC', a500 + 'CC'],
+      borderRadius: 6,
+      datalabels: { display: true, anchor: 'end', align: 'right', color: '#1A2332',
+        font: { weight: '700', size: 13 } }
+    }]
+  },
+  options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+    scales: { x: { grid: { color: gc }, max: 6 }, y: { grid: { display: false }, ticks: { font: { size: 11 } } } },
+    plugins: { legend: { display: false } } }
+});
+
+// ── Já estudou? ───────────────────────────────────────────────────
+new Chart(document.getElementById('jaEstudouChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Aprendi pouca coisa', 'Já tenho uma base', 'Primeira vez'],
+    datasets: [{
+      data: [5, 3, 3],
+      backgroundColor: [b600 + 'CC', g500 + 'CC', a500 + 'CC'],
+      borderRadius: 6,
+      datalabels: { display: true, anchor: 'end', align: 'right', color: '#1A2332',
+        font: { weight: '700', size: 13 } }
+    }]
+  },
+  options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+    scales: { x: { grid: { color: gc }, max: 7 }, y: { grid: { display: false }, ticks: { font: { size: 11 } } } },
+    plugins: { legend: { display: false } } }
+});
+
+// ── Renda ─────────────────────────────────────────────────────────
+new Chart(document.getElementById('rendaChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Sem renda', 'Até R$1.500', 'R$1.5k–2.5k', 'R$2.5k–5k', 'R$5k–10k'],
+    datasets: [{
+      data: [3, 3, 2, 1, 2],
+      backgroundColor: ['#CBD5E1', b600 + 'CC', b400 + 'CC', g500 + 'CC', t500 + 'CC'],
+      borderRadius: 6,
+      datalabels: { display: true, anchor: 'end', align: 'top', color: '#1A2332',
+        font: { weight: '700', size: 13 } }
+    }]
+  },
+  options: { responsive: true, maintainAspectRatio: false,
+    scales: { x: { grid: { display: false } }, y: { grid: { color: gc }, beginAtZero: true, max: 5 } },
+    plugins: { legend: { display: false } } }
+});
+
+// ── Escolaridade ──────────────────────────────────────────────────
+new Chart(document.getElementById('escolaridadeChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Superior completo', 'Superior incompleto', 'Médio completo'],
+    datasets: [{
+      data: [5, 3, 3],
+      backgroundColor: [b600 + 'CC', p500 + 'CC', a500 + 'CC'],
+      borderRadius: 6,
+      datalabels: { display: true, anchor: 'end', align: 'right', color: '#1A2332',
+        font: { weight: '700', size: 13 } }
+    }]
+  },
+  options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+    scales: { x: { grid: { color: gc }, max: 7 }, y: { grid: { display: false }, ticks: { font: { size: 11 } } } },
+    plugins: { legend: { display: false } } }
+});
+
+// ── Cartão de crédito ─────────────────────────────────────────────
+new Chart(document.getElementById('cartaoChart'), {
+  type: 'doughnut',
+  data: { labels: ['Sim', 'Não'],
+    datasets: [{ data: [6, 5], backgroundColor: [g500, r500],
+      borderWidth: 3, borderColor: '#fff', hoverOffset: 8 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, cutout: '55%',
+    plugins: {
+      legend: { position: 'bottom', labels: { usePointStyle: true, padding: 14 } },
+      datalabels: { display: true, color: '#fff', font: { weight: '700', size: 16 }, formatter: v => v } } }
+});
+
+// ── Curso online ──────────────────────────────────────────────────
+new Chart(document.getElementById('cursoOnlineChart'), {
+  type: 'doughnut',
+  data: { labels: ['Sim', 'Não'],
+    datasets: [{ data: [5, 6], backgroundColor: [g500, a500],
+      borderWidth: 3, borderColor: '#fff', hoverOffset: 8 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, cutout: '55%',
+    plugins: {
+      legend: { position: 'bottom', labels: { usePointStyle: true, padding: 14 } },
+      datalabels: { display: true, color: '#fff', font: { weight: '700', size: 16 }, formatter: v => v } } }
+});
+
+// ── Renda × Source (grouped bar, respondentes) ────────────────────
+new Chart(document.getElementById('rendaSourceChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Sem renda', 'Até R$1.5k', 'R$1.5k–2.5k', 'R$5k–10k'],
+    datasets: [
+      { label: 'Facebook Ads', data: [1, 2, 2, 1], backgroundColor: b600 + 'CC', borderRadius: 4 },
+      { label: 'YouTube',      data: [0, 1, 1, 0], backgroundColor: r500 + 'CC', borderRadius: 4 },
+      { label: 'Instagram',    data: [1, 0, 0, 0], backgroundColor: p500 + 'CC', borderRadius: 4 },
+      { label: 'AC/Outros',    data: [1, 0, 0, 1], backgroundColor: t500 + 'CC', borderRadius: 4 }
+    ]
+  },
+  options: { responsive: true, maintainAspectRatio: false,
+    scales: {
+      x: { grid: { display: false } },
+      y: { grid: { color: gc }, beginAtZero: true, ticks: { stepSize: 1 } }
+    },
+    plugins: { legend: { position: 'top', labels: { usePointStyle: true, padding: 14 } },
+      datalabels: { display: false } } }
+});
+
+</script>
+</body>
+</html>
