@@ -1,0 +1,28 @@
+name: Deploy via FTP
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@4.3.4
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASS }}
+          server-dir: /public_html/devemdobro/dashboardli26/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            DOCUMENTACAO-dashboard-li26.md
+            BASE_CONHECIMENTO_DASHBOARD.md
+            dashboard-li26-devin-dobro.html
