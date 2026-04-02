@@ -6,8 +6,8 @@
 <meta name="description" content="Dashboard analítico do Lançamento Interno #26 da Dev em Dobro — Semana do Zero ao Programador. Métricas de leads, email marketing, fontes de captação, compradores e insights.">
 <meta name="author" content="Dev em Dobro">
 <title>Dashboard LI26 — Dev em Dobro | Semana do Zero ao Programador</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1012,10 +1012,30 @@ function sortTable(tableId, colIdx) {
   table.querySelectorAll('th').forEach((th, i) => th.classList.toggle('sort-active', i === colIdx));
 }
 
+// ── Attachar eventos nas tabs via JS (fallback para ambientes com CSP restritivo) ──
+(function() {
+  var tabBar = document.querySelector('.tab-bar');
+  if (!tabBar) return;
+  tabBar.querySelectorAll('.tab-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var fn = btn.getAttribute('onclick') || '';
+      var m = fn.match(/switchTab\('([^']+)'/);
+      if (m) switchTab(m[1], btn);
+    });
+  });
+  document.querySelectorAll('.sub-tab').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var fn = btn.getAttribute('onclick') || '';
+      var m = fn.match(/switchSub\('([^']+)'/);
+      if (m) switchSub(m[1], btn);
+    });
+  });
+})();
+
 // ── Gráficos — inicialização protegida ───────────────────────────
 try {
-// Register datalabels plugin
-Chart.register(ChartDataLabels);
+// Register datalabels plugin (apenas se disponível)
+if (typeof ChartDataLabels !== 'undefined') Chart.register(ChartDataLabels);
 
 // Chart defaults
 Chart.defaults.color = '#5A6B7F';
